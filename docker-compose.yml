@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: rssflow
+      POSTGRES_USER: rssflow
+      POSTGRES_PASSWORD: rssflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rssflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_DSN: postgres://rssflow:rssflow@postgres:5432/rssflow?sslmode=disable
+      PORT: "8080"
+      JWT_SECRET: change-me-in-production
+
+volumes:
+  postgres_data:
