@@ -20,7 +20,7 @@ RUN go mod download
 COPY api/ .
 COPY --from=frontend-builder /app/dist ./web/dist
 
-RUN CGO_ENABLED=1 GOOS=linux go build -o /rssflow-api .
+RUN CGO_ENABLED=1 GOOS=linux go build -o /mound-api .
 
 # ── Stage 3: Runtime ───────────────────────────────────────────────────────────
 FROM alpine:3.21
@@ -28,7 +28,7 @@ FROM alpine:3.21
 RUN apk add --no-cache ca-certificates tzdata
 
 WORKDIR /app
-COPY --from=backend-builder /rssflow-api .
+COPY --from=backend-builder /mound-api .
 
 EXPOSE 8080
-CMD ["./rssflow-api"]
+CMD ["./mound-api"]

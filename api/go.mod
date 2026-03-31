@@ -1,4 +1,4 @@
-module rssflow/api
+module mound/api
 
 go 1.25.0
 

@@ -18,7 +18,7 @@ type Claims struct {
 func jwtSecret() []byte {
 	s := os.Getenv("JWT_SECRET")
 	if s == "" {
-		s = "rssflow-secret-change-in-prod"
+		s = "mound-secret-change-in-prod"
 	}
 	return []byte(s)
 }

@@ -5,8 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"rssflow/api/internal/middleware"
-	"rssflow/api/internal/model"
+	"mound/api/internal/middleware"
+	"mound/api/internal/model"
 )
 
 type registerReq struct {

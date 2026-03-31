@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"rssflow/api/internal/middleware"
-	"rssflow/api/internal/model"
+	"mound/api/internal/middleware"
+	"mound/api/internal/model"
 )
 
 // ── Categories ─────────────────────────────────────────

@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"rssflow/api/internal/handler"
-	"rssflow/api/internal/middleware"
-	"rssflow/api/internal/model"
+	"mound/api/internal/handler"
+	"mound/api/internal/middleware"
+	"mound/api/internal/model"
 )
 
 func main() {
