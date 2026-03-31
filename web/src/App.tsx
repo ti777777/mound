@@ -479,6 +479,9 @@ export default function App() {
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
 
+  const [leftOpen, setLeftOpen] = useState(false)
+  const [rightOpen, setRightOpen] = useState(false)
+
   useEffect(() => {
     async function loadData() {
       setLoading(true); setApiError(null)
@@ -694,7 +697,11 @@ export default function App() {
         <div className="flex gap-6 xl:gap-8">
 
           {/* ── Left Sidebar ── */}
-          <aside className="hidden lg:flex flex-col gap-4 w-52 xl:w-60 shrink-0 sticky top-20 h-fit">
+          {leftOpen && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setLeftOpen(false)}/>}
+          <aside className={leftOpen
+            ? 'fixed top-0 left-0 h-full w-64 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto lg:relative lg:top-auto lg:h-auto lg:w-52 xl:w-60 lg:shadow-none lg:z-auto lg:shrink-0 lg:sticky lg:top-20 lg:h-fit'
+            : 'hidden lg:flex flex-col gap-4 w-52 xl:w-60 shrink-0 sticky top-20 h-fit'
+          }>
             <div className="bg-white rounded-2xl border border-[#e2e8f0] p-4 space-y-3">
               <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">本月總覽</p>
               <div className="flex justify-between items-center text-sm">
@@ -801,7 +808,11 @@ export default function App() {
           </div>
 
           {/* ── Right Sidebar: Calendar + Categories ── */}
-          <aside className="hidden xl:flex flex-col gap-4 w-64 shrink-0 sticky top-20 h-fit">
+          {rightOpen && <div className="xl:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setRightOpen(false)}/>}
+          <aside className={rightOpen
+            ? 'fixed top-0 right-0 h-full w-72 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto xl:relative xl:top-auto xl:h-auto xl:w-64 xl:shadow-none xl:z-auto xl:shrink-0 xl:sticky xl:top-20 xl:h-fit'
+            : 'hidden xl:flex flex-col gap-4 w-64 shrink-0 sticky top-20 h-fit'
+          }>
             <Calendar expenses={expenses} filterDate={filterDate} onFilterDate={setFilterDate}/>
 
             <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
@@ -846,6 +857,22 @@ export default function App() {
 
         </div>
       </div>
+
+      {/* ── Sidebar toggle buttons (visible only when sidebar is hidden) ── */}
+      <button
+        onClick={() => setLeftOpen(true)}
+        className="lg:hidden fixed left-0 top-1/2 -translate-y-1/2 z-30 bg-white border border-[#e2e8f0] border-l-0 rounded-r-xl px-1.5 py-3 shadow-md text-[#94a3b8] hover:text-[#0ea5e9] hover:border-[#bae6fd] transition-colors"
+        title="顯示左側欄"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+      <button
+        onClick={() => setRightOpen(true)}
+        className="xl:hidden fixed right-0 top-1/2 -translate-y-1/2 z-30 bg-white border border-[#e2e8f0] border-r-0 rounded-l-xl px-1.5 py-3 shadow-md text-[#94a3b8] hover:text-[#0ea5e9] hover:border-[#bae6fd] transition-colors"
+        title="顯示右側欄"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
 
       {/* ── Modals ── */}
       <ExpenseModal open={addExpOpen} title="新增花費"
