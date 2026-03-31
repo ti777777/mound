@@ -59,7 +59,7 @@ export default function LoginPage() {
               <label className="block text-sm font-semibold text-[#374151] mb-1.5">電子郵件</label>
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com" autoComplete="email"
+                autoComplete="email"
                 className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
               />
             </div>
@@ -70,7 +70,7 @@ export default function LoginPage() {
               </div>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••" autoComplete="current-password"
+                autoComplete="current-password"
                 className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
               />
             </div>

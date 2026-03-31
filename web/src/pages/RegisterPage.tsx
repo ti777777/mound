@@ -64,7 +64,7 @@ export default function RegisterPage() {
               <label className="block text-sm font-semibold text-[#374151] mb-1.5">暱稱</label>
               <input
                 type="text" value={name} onChange={e => setName(e.target.value)}
-                placeholder="你的名字" autoComplete="name"
+                autoComplete="name"
                 className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
               />
             </div>
@@ -73,7 +73,7 @@ export default function RegisterPage() {
               <label className="block text-sm font-semibold text-[#374151] mb-1.5">電子郵件</label>
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com" autoComplete="email"
+                autoComplete="email"
                 className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
               />
             </div>
@@ -82,7 +82,7 @@ export default function RegisterPage() {
               <label className="block text-sm font-semibold text-[#374151] mb-1.5">密碼</label>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
-                placeholder="至少 6 個字元" autoComplete="new-password"
+                autoComplete="new-password"
                 className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
               />
             </div>
@@ -91,7 +91,7 @@ export default function RegisterPage() {
               <label className="block text-sm font-semibold text-[#374151] mb-1.5">確認密碼</label>
               <input
                 type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
-                placeholder="再次輸入密碼" autoComplete="new-password"
+                autoComplete="new-password"
                 className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
               />
             </div>
