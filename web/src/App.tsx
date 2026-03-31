@@ -94,9 +94,10 @@ const emptyExpenseForm = (): ExpenseForm => ({
   note: '',
 })
 
-function ExpenseModal({ open, title, form, categories, onFormChange, onSubmit, onClose, submitting, apiError }: {
+function ExpenseModal({ open, title, form, categories, keywords, onFormChange, onSubmit, onClose, submitting, apiError }: {
   open: boolean; title: string; form: ExpenseForm
   categories: Category[]
+  keywords?: string[]
   onFormChange: (f: ExpenseForm) => void; onSubmit: () => void; onClose: () => void
   submitting?: boolean; apiError?: string | null
 }) {
@@ -149,6 +150,16 @@ function ExpenseModal({ open, title, form, categories, onFormChange, onSubmit, o
               placeholder="例：午餐、計程車、購物…"
               className={`w-full bg-[#f8fafc] border rounded-xl py-2.5 px-4 text-sm focus:bg-white transition-colors outline-none ${errors.description ? 'border-red-300 focus:border-red-400' : 'border-[#e2e8f0] focus:border-[#0ea5e9]'}`}/>
             {errors.description && <p className="text-xs text-red-400 mt-1">{errors.description}</p>}
+            {keywords && keywords.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {keywords.map(kw => (
+                  <button key={kw} type="button" onClick={() => onFormChange({...form, description: kw})}
+                    className={`px-2.5 py-1 text-xs font-medium rounded-lg border transition-colors ${form.description === kw ? 'bg-[#0ea5e9] text-white border-[#0ea5e9]' : 'bg-[#f0f9ff] text-[#0ea5e9] border-[#bae6fd] hover:bg-[#e0f2fe]'}`}>
+                    {kw}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           {/* Category */}
           <div>
@@ -546,6 +557,24 @@ export default function App() {
 
   const [leftOpen, setLeftOpen] = useState(false)
   const [rightOpen, setRightOpen] = useState(false)
+
+  // Keywords
+  const [keywords, setKeywords] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('mound_keywords') ?? '[]') } catch { return [] }
+  })
+  const [newKeyword, setNewKeyword] = useState('')
+
+  const saveKeywords = (kws: string[]) => {
+    setKeywords(kws)
+    localStorage.setItem('mound_keywords', JSON.stringify(kws))
+  }
+  const handleAddKeyword = () => {
+    const kw = newKeyword.trim()
+    if (!kw || keywords.includes(kw)) { setNewKeyword(''); return }
+    saveKeywords([...keywords, kw])
+    setNewKeyword('')
+  }
+  const handleDeleteKeyword = (kw: string) => saveKeywords(keywords.filter(k => k !== kw))
 
   useEffect(() => {
     async function loadData() {
@@ -946,6 +975,42 @@ export default function App() {
                 ))}
               </div>
             </div>
+
+            {/* ── 常用關鍵字 ── */}
+            <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
+              <div className="px-4 py-3 border-b border-[#e2e8f0]">
+                <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">常用關鍵字</p>
+              </div>
+              <div className="p-3 space-y-2">
+                <div className="flex gap-1.5">
+                  <input
+                    type="text" value={newKeyword}
+                    onChange={e => setNewKeyword(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddKeyword() } }}
+                    placeholder="新增關鍵字…"
+                    className="flex-1 min-w-0 bg-[#f8fafc] border border-[#e2e8f0] rounded-lg py-1.5 px-2.5 text-xs focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"/>
+                  <button onClick={handleAddKeyword}
+                    className="shrink-0 px-2.5 py-1.5 text-xs font-bold bg-[#0ea5e9] text-white rounded-lg hover:bg-[#0284c7] transition-colors">
+                    新增
+                  </button>
+                </div>
+                {keywords.length === 0 ? (
+                  <p className="text-xs text-[#94a3b8] text-center py-1">尚無關鍵字</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5">
+                    {keywords.map(kw => (
+                      <span key={kw} className="group flex items-center gap-1 pl-2.5 pr-1 py-1 bg-[#f0f9ff] border border-[#bae6fd] rounded-lg text-xs text-[#0ea5e9] font-medium">
+                        {kw}
+                        <button onClick={() => handleDeleteKeyword(kw)} title="刪除"
+                          className="w-4 h-4 flex items-center justify-center rounded hover:bg-[#0ea5e9] hover:text-white transition-colors text-[#94a3b8]">
+                          <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </aside>
 
         </div>
@@ -969,12 +1034,12 @@ export default function App() {
 
       {/* ── Modals ── */}
       <ExpenseModal open={addExpOpen} title="新增花費"
-        form={addExpForm} categories={categories}
+        form={addExpForm} categories={categories} keywords={keywords}
         onFormChange={setAddExpForm} onSubmit={handleAddExpSubmit}
         onClose={() => setAddExpOpen(false)} submitting={submitting} apiError={formError}/>
 
       <ExpenseModal open={editExpense !== null} title="編輯花費"
-        form={editExpForm} categories={categories}
+        form={editExpForm} categories={categories} keywords={keywords}
         onFormChange={setEditExpForm} onSubmit={handleEditExpSubmit}
         onClose={() => setEditExpense(null)} submitting={submitting} apiError={formError}/>
 
