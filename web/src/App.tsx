@@ -806,7 +806,7 @@ export default function App() {
           {/* ── Left Sidebar ── */}
           {leftOpen && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setLeftOpen(false)}/>}
           <aside className={leftOpen
-            ? 'fixed top-0 left-0 h-full w-64 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto lg:relative lg:top-auto lg:h-auto lg:w-52 xl:w-60 lg:shadow-none lg:z-auto lg:shrink-0 lg:sticky lg:top-4 lg:h-fit'
+            ? 'fixed top-0 left-0 h-full w-64 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto [&>*]:shrink-0 lg:relative lg:top-auto lg:h-auto lg:w-52 xl:w-60 lg:shadow-none lg:z-auto lg:shrink-0 lg:sticky lg:top-4 lg:h-fit'
             : 'hidden lg:flex flex-col gap-4 w-52 xl:w-60 shrink-0 sticky top-4 h-fit'
           }>
             <div className="bg-white rounded-2xl border border-[#e2e8f0] p-4 space-y-3">
@@ -932,7 +932,7 @@ export default function App() {
           {/* ── Right Sidebar: Calendar + Categories ── */}
           {rightOpen && <div className="xl:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setRightOpen(false)}/>}
           <aside className={rightOpen
-            ? 'fixed top-0 right-0 h-full w-72 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto xl:relative xl:top-auto xl:h-auto xl:w-64 xl:shadow-none xl:z-auto xl:shrink-0 xl:sticky xl:top-4 xl:h-fit'
+            ? 'fixed top-0 right-0 h-full w-72 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto [&>*]:shrink-0 xl:relative xl:top-auto xl:h-auto xl:w-64 xl:shadow-none xl:z-auto xl:shrink-0 xl:sticky xl:top-4 xl:h-fit'
             : 'hidden xl:flex flex-col gap-4 w-64 shrink-0 sticky top-4 h-fit'
           }>
             <Calendar expenses={expenses} filterDate={filterDate} onFilterDate={setFilterDate}/>
