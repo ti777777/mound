@@ -61,7 +61,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-1.5">暱稱</label>
+              <label className="block text-sm font-semibold text-[#374151] mb-1.5">帳號</label>
               <input
                 type="text" value={name} onChange={e => setName(e.target.value)}
                 autoComplete="name"

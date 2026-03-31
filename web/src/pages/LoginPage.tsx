@@ -5,7 +5,7 @@ import { setAuth } from '../api'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -13,14 +13,14 @@ export default function LoginPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
-    if (!email || !password) { setError('請填寫所有欄位'); return }
+    if (!identifier || !password) { setError('請填寫所有欄位'); return }
 
     setLoading(true)
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, password }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -56,10 +56,10 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-1.5">電子郵件</label>
+              <label className="block text-sm font-semibold text-[#374151] mb-1.5">帳號 / 電子郵件</label>
               <input
-                type="email" value={email} onChange={e => setEmail(e.target.value)}
-                autoComplete="email"
+                type="text" value={identifier} onChange={e => setIdentifier(e.target.value)}
+                autoComplete="username"
                 className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
               />
             </div>

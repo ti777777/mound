@@ -28,9 +28,19 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	var existing model.User
+	if err := model.DB.Where("name = ?", req.Name).First(&existing).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "帳號已被使用"})
+		return
+	}
+	if err := model.DB.Where("email = ?", req.Email).First(&existing).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "此 Email 已被註冊"})
+		return
+	}
+
 	user := model.User{Name: req.Name, Email: req.Email, Password: string(hash)}
 	if err := model.DB.Create(&user).Error; err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
+		c.JSON(http.StatusConflict, gin.H{"error": "註冊失敗，請稍後再試"})
 		return
 	}
 
@@ -42,8 +52,8 @@ func Register(c *gin.Context) {
 }
 
 type loginReq struct {
-	Email    string `json:"email"    binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	Identifier string `json:"identifier" binding:"required"`
+	Password   string `json:"password"   binding:"required"`
 }
 
 func Login(c *gin.Context) {
@@ -54,7 +64,7 @@ func Login(c *gin.Context) {
 	}
 
 	var user model.User
-	if err := model.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+	if err := model.DB.Where("email = ? OR name = ?", req.Identifier, req.Identifier).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
 		return
 	}
