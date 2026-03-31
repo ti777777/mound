@@ -758,7 +758,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       {/* ── Navbar ── */}
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-[#e2e8f0]">
+      <header className="bg-white border-b border-[#e2e8f0]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-3 h-14">
           <a href="#" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 bg-[#0ea5e9] rounded-lg flex items-center justify-center">
@@ -806,8 +806,8 @@ export default function App() {
           {/* ── Left Sidebar ── */}
           {leftOpen && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setLeftOpen(false)}/>}
           <aside className={leftOpen
-            ? 'fixed top-0 left-0 h-full w-64 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto lg:relative lg:top-auto lg:h-auto lg:w-52 xl:w-60 lg:shadow-none lg:z-auto lg:shrink-0 lg:sticky lg:top-20 lg:h-fit'
-            : 'hidden lg:flex flex-col gap-4 w-52 xl:w-60 shrink-0 sticky top-20 h-fit'
+            ? 'fixed top-0 left-0 h-full w-64 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto lg:relative lg:top-auto lg:h-auto lg:w-52 xl:w-60 lg:shadow-none lg:z-auto lg:shrink-0 lg:sticky lg:top-4 lg:h-fit'
+            : 'hidden lg:flex flex-col gap-4 w-52 xl:w-60 shrink-0 sticky top-4 h-fit'
           }>
             <div className="bg-white rounded-2xl border border-[#e2e8f0] p-4 space-y-3">
               <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">本月總覽</p>
@@ -932,8 +932,8 @@ export default function App() {
           {/* ── Right Sidebar: Calendar + Categories ── */}
           {rightOpen && <div className="xl:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setRightOpen(false)}/>}
           <aside className={rightOpen
-            ? 'fixed top-0 right-0 h-full w-72 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto xl:relative xl:top-auto xl:h-auto xl:w-64 xl:shadow-none xl:z-auto xl:shrink-0 xl:sticky xl:top-20 xl:h-fit'
-            : 'hidden xl:flex flex-col gap-4 w-64 shrink-0 sticky top-20 h-fit'
+            ? 'fixed top-0 right-0 h-full w-72 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto xl:relative xl:top-auto xl:h-auto xl:w-64 xl:shadow-none xl:z-auto xl:shrink-0 xl:sticky xl:top-4 xl:h-fit'
+            : 'hidden xl:flex flex-col gap-4 w-64 shrink-0 sticky top-4 h-fit'
           }>
             <Calendar expenses={expenses} filterDate={filterDate} onFilterDate={setFilterDate}/>
 
