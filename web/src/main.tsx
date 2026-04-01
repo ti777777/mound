@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
+import { DateRangeProvider } from './contexts/DateRangeContext.tsx'
 
 function isLoggedIn() {
   return !!localStorage.getItem('mound_auth')
@@ -20,12 +21,14 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-        <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-        <Route path="/*" element={<ProtectedRoute><App /></ProtectedRoute>} />
-      </Routes>
-    </BrowserRouter>
+    <DateRangeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+          <Route path="/*" element={<ProtectedRoute><App /></ProtectedRoute>} />
+        </Routes>
+      </BrowserRouter>
+    </DateRangeProvider>
   </StrictMode>,
 )

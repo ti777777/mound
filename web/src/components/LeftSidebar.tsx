@@ -1,11 +1,11 @@
 import type { Category, ChartDatum } from '../types'
 import { DonutChart, BarChart } from './Charts'
 
-export default function LeftSidebar({ open, onClose, thisMonthTotal, thisMonthCount, categoriesCount, activeCategories, filterCategory, onFilterCategory, categoryTotals }: {
+export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, categoriesCount, activeCategories, filterCategory, onFilterCategory, categoryTotals }: {
   open: boolean
   onClose: () => void
-  thisMonthTotal: number
-  thisMonthCount: number
+  rangeTotal: number
+  rangeCount: number
   categoriesCount: number
   activeCategories: Category[]
   filterCategory: string | null
@@ -20,14 +20,14 @@ export default function LeftSidebar({ open, onClose, thisMonthTotal, thisMonthCo
         : 'hidden lg:flex flex-col gap-4 w-52 xl:w-60 shrink-0 sticky top-4 h-fit'
       }>
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-4 space-y-3">
-          <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">本月總覽</p>
+          <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">總覽</p>
           <div className="flex justify-between items-center text-sm">
             <span className="text-slate-600">總支出</span>
-            <span className="font-bold text-[#0ea5e9]">NT${thisMonthTotal.toLocaleString()}</span>
+            <span className="font-bold text-[#0ea5e9]">NT${rangeTotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-slate-600">筆數</span>
-            <span className="font-bold text-slate-800">{thisMonthCount}</span>
+            <span className="font-bold text-slate-800">{rangeCount}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-slate-600">類別數</span>

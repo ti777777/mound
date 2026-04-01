@@ -10,10 +10,12 @@ import RightSidebar from './components/RightSidebar'
 import ExpenseModal from './components/ExpenseModal'
 import CategoryModal from './components/CategoryModal'
 import DeleteModal from './components/DeleteModal'
+import { useDateRange } from './contexts/DateRangeContext'
 
 export default function App() {
   const navigate = useNavigate()
   const auth = JSON.parse(localStorage.getItem('mound_auth') ?? '{}') as { email?: string; name?: string; token?: string }
+  const { dateRange } = useDateRange()
 
   async function handleLogout() {
     try { await authFetch('/api/auth/logout', { method: 'POST' }) } catch { /* noop */ }
@@ -26,7 +28,6 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState<string | null>(null)
   const [filterCategory, setFilterCategory] = useState<string | null>(null)
-  const [filterDate, setFilterDate] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState<'date' | 'amount'>('date')
 
@@ -95,17 +96,22 @@ export default function App() {
   }, [])
 
   // Stats
-  const now = new Date()
-  const thisMonthExpenses = expenses.filter(e => {
-    const d = new Date(e.date)
-    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()
-  })
-  const thisMonthTotal = thisMonthExpenses.reduce((s, e) => s + e.amount, 0)
   const activeCategories = categories.filter(c => c.active)
+
+  const rangeExpenses = useMemo(() =>
+    expenses.filter(e => {
+      if (!dateRange.start) return true
+      const d = toDateStr(e.date)
+      const end = dateRange.end ?? dateRange.start
+      return d >= dateRange.start && d <= end
+    }),
+    [expenses, dateRange]
+  )
+  const rangeTotal = rangeExpenses.reduce((s, e) => s + e.amount, 0)
 
   const categoryTotals = useMemo<ChartDatum[]>(() => {
     const map = new Map<string, { color: string; total: number }>()
-    expenses.forEach(e => {
+    rangeExpenses.forEach(e => {
       const key = e.categoryName
       const cur = map.get(key)
       if (cur) cur.total += e.amount
@@ -114,13 +120,12 @@ export default function App() {
     return Array.from(map.entries())
       .map(([name, { color, total }]) => ({ name, color, total }))
       .sort((a, b) => b.total - a.total)
-  }, [expenses])
+  }, [rangeExpenses])
 
   // Filtered list
-  const visibleExpenses = expenses
+  const visibleExpenses = rangeExpenses
     .filter(e => {
       if (filterCategory && e.categoryName !== filterCategory) return false
-      if (filterDate && toDateStr(e.date) !== filterDate) return false
       if (search) {
         const q = search.toLowerCase()
         if (!e.description.toLowerCase().includes(q) && !e.categoryName.toLowerCase().includes(q)) return false
@@ -263,8 +268,8 @@ export default function App() {
           <LeftSidebar
             open={leftOpen}
             onClose={() => setLeftOpen(false)}
-            thisMonthTotal={thisMonthTotal}
-            thisMonthCount={thisMonthExpenses.length}
+            rangeTotal={rangeTotal}
+            rangeCount={rangeExpenses.length}
             categoriesCount={categories.length}
             activeCategories={activeCategories}
             filterCategory={filterCategory}
@@ -276,13 +281,11 @@ export default function App() {
             loading={loading}
             expenses={expenses}
             visibleExpenses={visibleExpenses}
-            filterDate={filterDate}
             filterCategory={filterCategory}
             search={search}
             sort={sort}
             onSearch={setSearch}
             onSort={setSort}
-            onFilterDate={setFilterDate}
             onAddExpense={handleAddExpOpen}
             onEdit={handleEditExpOpen}
             onDelete={setDeleteExpense}
@@ -292,8 +295,6 @@ export default function App() {
             open={rightOpen}
             onClose={() => setRightOpen(false)}
             expenses={expenses}
-            filterDate={filterDate}
-            onFilterDate={setFilterDate}
             loading={loading}
             categories={categories}
             onAddCategory={handleAddCatOpen}

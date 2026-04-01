@@ -1,12 +1,10 @@
 import type { Expense, Category } from '../types'
 import Calendar from './Calendar'
 
-export default function RightSidebar({ open, onClose, expenses, filterDate, onFilterDate, loading, categories, onAddCategory, onEditCategory, onDeleteCategory, keywords, newKeyword, onNewKeywordChange, onAddKeyword, onDeleteKeyword }: {
+export default function RightSidebar({ open, onClose, expenses, loading, categories, onAddCategory, onEditCategory, onDeleteCategory, keywords, newKeyword, onNewKeywordChange, onAddKeyword, onDeleteKeyword }: {
   open: boolean
   onClose: () => void
   expenses: Expense[]
-  filterDate: string | null
-  onFilterDate: (d: string | null) => void
   loading: boolean
   categories: Category[]
   onAddCategory: () => void
@@ -25,7 +23,7 @@ export default function RightSidebar({ open, onClose, expenses, filterDate, onFi
         ? 'fixed top-0 right-0 h-full w-72 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto [&>*]:shrink-0 xl:relative xl:top-auto xl:h-auto xl:w-64 xl:shadow-none xl:z-auto xl:shrink-0 xl:sticky xl:top-4 xl:h-fit'
         : 'hidden xl:flex flex-col gap-4 w-64 shrink-0 sticky top-4 h-fit'
       }>
-        <Calendar expenses={expenses} filterDate={filterDate} onFilterDate={onFilterDate}/>
+        <Calendar expenses={expenses}/>
 
         <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
           <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between">

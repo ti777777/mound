@@ -1,33 +1,41 @@
 import type { Expense } from '../types'
 import ExpenseCard from './ExpenseCard'
+import { useDateRange } from '../contexts/DateRangeContext'
 
-export default function ExpenseList({ loading, expenses, visibleExpenses, filterDate, filterCategory, search, sort, onSearch, onSort, onFilterDate, onAddExpense, onEdit, onDelete }: {
+export default function ExpenseList({ loading, expenses, visibleExpenses, filterCategory, search, sort, onSearch, onSort, onAddExpense, onEdit, onDelete }: {
   loading: boolean
   expenses: Expense[]
   visibleExpenses: Expense[]
-  filterDate: string | null
   filterCategory: string | null
   search: string
   sort: 'date' | 'amount'
   onSearch: (v: string) => void
   onSort: (v: 'date' | 'amount') => void
-  onFilterDate: (d: string | null) => void
   onAddExpense: () => void
   onEdit: (e: Expense) => void
   onDelete: (e: Expense) => void
 }) {
+  const { dateRange, clearDateRange } = useDateRange()
+  const fmtD = (s: string) => s.replace(/^(\d+)-(\d+)-(\d+)$/, '$1/$2/$3')
+
+  const dateLabel = (() => {
+    if (!dateRange.start) return null
+    if (dateRange.end && dateRange.end !== dateRange.start) return `${fmtD(dateRange.start)} – ${fmtD(dateRange.end)}`
+    return fmtD(dateRange.start)
+  })()
+
   return (
     <div className="flex-1 min-w-0 space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h3 className="font-bold text-slate-800">
-            {filterDate
-              ? filterDate.replace(/^(\d+)-(\d+)-(\d+)$/, '$1/$2/$3') + ' 的花費'
+            {dateLabel
+              ? `${dateLabel} 的花費`
               : filterCategory ? `${filterCategory} 的花費` : '全部花費'}
           </h3>
           <p className="text-sm text-[#94a3b8] mt-0.5">
             共 {visibleExpenses.length} 筆
-            {filterDate && <> · <button onClick={() => onFilterDate(null)} className="underline hover:text-[#0ea5e9]">清除日期篩選</button></>}
+            {dateLabel && <> · <button onClick={clearDateRange} className="underline hover:text-[#0ea5e9]">清除日期篩選</button></>}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">

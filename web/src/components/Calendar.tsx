@@ -1,12 +1,10 @@
 import { useState } from 'react'
 import type { Expense } from '../types'
 import { MONTHS, toDateStr } from '../utils'
+import { useDateRange } from '../contexts/DateRangeContext'
 
-export default function Calendar({ expenses, filterDate, onFilterDate }: {
-  expenses: Expense[]
-  filterDate: string | null
-  onFilterDate: (d: string | null) => void
-}) {
+export default function Calendar({ expenses }: { expenses: Expense[] }) {
+  const { dateRange, setDateRange, clearDateRange } = useDateRange()
   const [{ year, month }, setCal] = useState(() => {
     const n = new Date()
     return { year: n.getFullYear(), month: n.getMonth() }
@@ -17,7 +15,7 @@ export default function Calendar({ expenses, filterDate, onFilterDate }: {
 
   const prev = () => setCal(c => c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 })
   const next = () => setCal(c => c.month === 11 ? { year: c.year + 1, month: 0 } : { year: c.year, month: c.month + 1 })
-  const goToday = () => { setCal({ year: today.getFullYear(), month: today.getMonth() }); onFilterDate(null) }
+  const goToday = () => { setCal({ year: today.getFullYear(), month: today.getMonth() }); clearDateRange() }
 
   const daysWithExpenses = new Set(
     expenses
@@ -25,16 +23,35 @@ export default function Calendar({ expenses, filterDate, onFilterDate }: {
       .map(e => new Date(e.date).getDate())
   )
 
-  const selectedTotal = filterDate
-    ? expenses.filter(e => toDateStr(e.date) === filterDate).reduce((s, e) => s + e.amount, 0)
-    : null
+  const rangeTotal = (() => {
+    if (!dateRange.start) return null
+    const end = dateRange.end ?? dateRange.start
+    return expenses
+      .filter(e => { const d = toDateStr(e.date); return d >= dateRange.start! && d <= end })
+      .reduce((s, e) => s + e.amount, 0)
+  })()
 
   const days = Array(firstDay).fill(null).concat(Array.from({ length: daysInMonth }, (_, i) => i + 1))
 
   const handleDayClick = (d: number) => {
     const str = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
-    onFilterDate(filterDate === str ? null : str)
+    const { start, end } = dateRange
+    if (start && end) {
+      setDateRange({ start: str, end: null })
+    } else if (start && !end) {
+      if (str === start) {
+        clearDateRange()
+      } else if (str >= start) {
+        setDateRange({ start, end: str })
+      } else {
+        setDateRange({ start: str, end: start })
+      }
+    } else {
+      setDateRange({ start: str, end: null })
+    }
   }
+
+  const fmtD = (s: string) => s.replace(/^(\d+)-(\d+)-(\d+)$/, '$1/$2/$3')
 
   return (
     <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
@@ -62,13 +79,23 @@ export default function Calendar({ expenses, filterDate, onFilterDate }: {
           const isLastRow = i >= days.length - 7
           const hasExpenses = d !== null && daysWithExpenses.has(d)
           const dateStr = d !== null ? `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}` : ''
-          const isSelected = d !== null && filterDate === dateStr
+          const rangeComplete = !!dateRange.start && !!dateRange.end
+          const isStart = d !== null && dateStr === dateRange.start
+          const isEnd = d !== null && !!dateRange.end && dateStr === dateRange.end
+          const isInRange = d !== null && rangeComplete && dateStr > dateRange.start! && dateStr < dateRange.end!
+          const isSelected = isStart || isEnd
           return (
-            <div key={i} className={`cal-day border-[#e2e8f0] p-0.5 ${col !== 6 ? 'border-r' : ''} ${!isLastRow ? 'border-b' : ''}`}>
+            <div key={i} className={`cal-day relative h-9 border-[#e2e8f0] ${col !== 6 ? 'border-r' : ''} ${!isLastRow ? 'border-b' : ''}`}>
               {d !== null && (
                 <button onClick={() => handleDayClick(d)}
-                  className={`w-full flex flex-col items-center py-0.5 rounded-lg transition-colors ${
-                    isSelected ? 'bg-[#0ea5e9]' : hasExpenses ? 'hover:bg-[#e0f2fe] cursor-pointer' : 'hover:bg-[#f8fafc] cursor-pointer'
+                  className={`absolute inset-0 flex flex-col items-center pt-1 transition-colors cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#0ea5e9]'
+                      : isInRange
+                        ? 'bg-[#bae6fd]/40 hover:bg-[#bae6fd]/70'
+                        : hasExpenses
+                          ? 'hover:bg-[#e0f2fe]'
+                          : 'hover:bg-[#f8fafc]'
                   }`}>
                   <span className={`text-xs font-semibold leading-none ${
                     isSelected ? 'text-white' : isToday ? 'text-[#0ea5e9]' : col === 0 ? 'text-red-400' : col === 6 ? 'text-[#0ea5e9]' : 'text-slate-600'
@@ -83,19 +110,24 @@ export default function Calendar({ expenses, filterDate, onFilterDate }: {
         })}
       </div>
       <div className="px-4 py-2.5 border-t border-[#e2e8f0] flex items-center justify-between min-h-[36px]">
-        {filterDate ? (
+        {dateRange.start ? (
           <>
             <span className="text-xs text-slate-600 font-semibold">
-              {filterDate.replace(/^(\d+)-(\d+)-(\d+)$/, '$1/$2/$3')}
-              {selectedTotal !== null && <> · NT${selectedTotal.toLocaleString()}</>}
+              {fmtD(dateRange.start)}
+              {dateRange.end && dateRange.end !== dateRange.start && <> – {fmtD(dateRange.end)}</>}
+              {rangeTotal !== null && <> · NT${rangeTotal.toLocaleString()}</>}
             </span>
-            <button onClick={() => onFilterDate(null)} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors flex items-center gap-1">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
-              清除
-            </button>
+            {dateRange.end ? (
+              <button onClick={clearDateRange} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                清除
+              </button>
+            ) : (
+              <span className="text-xs text-[#94a3b8]">再選結束日期</span>
+            )}
           </>
         ) : (
-          <span className="text-xs text-[#94a3b8]">點擊日期可篩選花費</span>
+          <span className="text-xs text-[#94a3b8]">點擊日期可選擇區間</span>
         )}
       </div>
     </div>
