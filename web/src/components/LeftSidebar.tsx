@@ -1,0 +1,76 @@
+import type { Category, ChartDatum } from '../types'
+import { DonutChart, BarChart } from './Charts'
+
+export default function LeftSidebar({ open, onClose, thisMonthTotal, thisMonthCount, categoriesCount, activeCategories, filterCategory, onFilterCategory, categoryTotals }: {
+  open: boolean
+  onClose: () => void
+  thisMonthTotal: number
+  thisMonthCount: number
+  categoriesCount: number
+  activeCategories: Category[]
+  filterCategory: string | null
+  onFilterCategory: (cat: string | null) => void
+  categoryTotals: ChartDatum[]
+}) {
+  return (
+    <>
+      {open && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={onClose}/>}
+      <aside className={open
+        ? 'fixed top-0 left-0 h-full w-64 z-50 bg-[#f8fafc] shadow-2xl flex flex-col gap-4 p-4 pt-4 overflow-y-auto [&>*]:shrink-0 lg:relative lg:top-auto lg:h-auto lg:w-52 xl:w-60 lg:shadow-none lg:z-auto lg:shrink-0 lg:sticky lg:top-4 lg:h-fit'
+        : 'hidden lg:flex flex-col gap-4 w-52 xl:w-60 shrink-0 sticky top-4 h-fit'
+      }>
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] p-4 space-y-3">
+          <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">本月總覽</p>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-slate-600">總支出</span>
+            <span className="font-bold text-[#0ea5e9]">NT${thisMonthTotal.toLocaleString()}</span>
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-slate-600">筆數</span>
+            <span className="font-bold text-slate-800">{thisMonthCount}</span>
+          </div>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-slate-600">類別數</span>
+            <span className="font-bold text-slate-800">{categoriesCount}</span>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between">
+            <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">類別篩選</p>
+            <button onClick={() => onFilterCategory(null)} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors">清除</button>
+          </div>
+          <div className="p-3 flex flex-wrap gap-2">
+            {activeCategories.length === 0
+              ? <span className="text-xs text-[#94a3b8]">尚無類別</span>
+              : activeCategories.map(c => (
+                <button key={c.id} onClick={() => onFilterCategory(filterCategory === c.name ? null : c.name)}
+                  className={`text-xs font-semibold px-2.5 py-1 rounded-full border transition-colors ${
+                    filterCategory === c.name ? 'text-white border-transparent' : 'bg-[#f8fafc] text-slate-600 border-[#e2e8f0] hover:border-[#0ea5e9] hover:text-[#0ea5e9]'
+                  }`}
+                  style={filterCategory === c.name ? { background: c.color, borderColor: c.color } : {}}>
+                  {c.name}
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#e2e8f0]">
+            <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">分類統計</p>
+          </div>
+          <div className="p-4 space-y-4">
+            <DonutChart data={categoryTotals}/>
+            {categoryTotals.length > 0 && (
+              <>
+                <div className="border-t border-[#f1f5f9]"/>
+                <BarChart data={categoryTotals}/>
+              </>
+            )}
+          </div>
+        </div>
+      </aside>
+    </>
+  )
+}
