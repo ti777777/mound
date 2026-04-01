@@ -1,0 +1,132 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "add": "Add",
+    "edit": "Edit",
+    "loading": "Loading…",
+    "processing": "Processing…",
+    "deleting": "Deleting…",
+    "saveChanges": "Save Changes",
+    "uncategorized": "Uncategorized",
+    "reload": "Reload"
+  },
+  "app": {
+    "loadFailed": "Load failed, please refresh",
+    "showLeftPanel": "Show left panel",
+    "showRightPanel": "Show right panel"
+  },
+  "nav": {
+    "addExpense": "Add Expense",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to manage your expenses",
+    "accountLabel": "Account / Email",
+    "passwordLabel": "Password",
+    "submit": "Sign In",
+    "submitting": "Signing in…",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Register now",
+    "errorFillAll": "Please fill in all fields",
+    "errorCredentials": "Invalid account or password",
+    "errorNetwork": "Network error, please try again later"
+  },
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Start tracking your expenses",
+    "nameLabel": "Username",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmLabel": "Confirm Password",
+    "submit": "Create Account",
+    "submitting": "Creating…",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in now",
+    "errorFillAll": "Please fill in all fields",
+    "errorPasswordLength": "Password must be at least 6 characters",
+    "errorPasswordMismatch": "Passwords do not match",
+    "errorFailed": "Registration failed, please try again later",
+    "errorNetwork": "Network error, please try again later"
+  },
+  "expense": {
+    "addTitle": "Add Expense",
+    "editTitle": "Edit Expense",
+    "amountLabel": "Amount",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "e.g. Lunch, Taxi, Shopping…",
+    "categoryLabel": "Category",
+    "dateLabel": "Date",
+    "noteLabel": "Note",
+    "notePlaceholder": "Optional",
+    "errorAmount": "Please enter a valid amount",
+    "errorDescription": "Please enter a description",
+    "errorDate": "Please select a date",
+    "addFailed": "Failed to add",
+    "saveFailed": "Failed to save"
+  },
+  "category": {
+    "addTitle": "Add Category",
+    "editTitle": "Edit Category",
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Food, Transport, Entertainment…",
+    "colorLabel": "Color",
+    "activeLabel": "Enable Category",
+    "activeHint": "Hidden from filters when disabled",
+    "errorName": "Please enter a category name",
+    "addFailed": "Failed to add",
+    "saveFailed": "Failed to save"
+  },
+  "deleteModal": {
+    "title": "Are you sure?",
+    "expenseMessage": "\"{{description}}\" ({{amount}}) will be permanently deleted",
+    "categoryMessage": "Category \"{{name}}\" will be deleted, related expenses will be uncategorized"
+  },
+  "leftSidebar": {
+    "overview": "Overview",
+    "totalExpenses": "Total Expenses",
+    "count": "Count",
+    "categoryCount": "Categories",
+    "categoryFilter": "Category Filter",
+    "clear": "Clear",
+    "noCategories": "No categories",
+    "categoryStats": "Category Stats"
+  },
+  "rightSidebar": {
+    "categoryManagement": "Category Management",
+    "noCategories": "No categories",
+    "commonKeywords": "Common Keywords",
+    "addKeywordPlaceholder": "Add keyword…",
+    "noKeywords": "No keywords yet"
+  },
+  "expenseList": {
+    "allExpenses": "All Expenses",
+    "expensesForDate": "Expenses for {{date}}",
+    "expensesForCategory": "{{category}} Expenses",
+    "totalCount": "{{count}} items",
+    "clearDateFilter": "Clear date filter",
+    "searchPlaceholder": "Search description or category…",
+    "sortNewest": "Newest first",
+    "sortAmount": "Sort by amount",
+    "noExpenses": "No expenses recorded yet",
+    "noMatchingExpenses": "No matching expenses",
+    "startHint": "Click \"Add Expense\" to start tracking",
+    "clearFilterHint": "Try clearing filters",
+    "addFirstExpense": "Add First Expense"
+  },
+  "charts": {
+    "total": "Total",
+    "noData": "No data"
+  },
+  "calendar": {
+    "months": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+    "weekdays": ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+    "yearMonth": "{{month}} {{year}}",
+    "today": "Today",
+    "selectEndDate": "Select end date",
+    "clickToSelect": "Click dates to select a range",
+    "clear": "Clear"
+  }
+}

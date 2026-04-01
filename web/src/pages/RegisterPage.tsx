@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router'
+import { useTranslation } from 'react-i18next'
 import { setAuth } from '../api'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -16,9 +18,9 @@ export default function RegisterPage() {
     e.preventDefault()
     setError('')
 
-    if (!name || !email || !password || !confirm) { setError('請填寫所有欄位'); return }
-    if (password.length < 6) { setError('密碼至少需要 6 個字元'); return }
-    if (password !== confirm) { setError('兩次輸入的密碼不一致'); return }
+    if (!name || !email || !password || !confirm) { setError(t('register.errorFillAll')); return }
+    if (password.length < 6) { setError(t('register.errorPasswordLength')); return }
+    if (password !== confirm) { setError(t('register.errorPasswordMismatch')); return }
 
     setLoading(true)
     try {
@@ -29,13 +31,13 @@ export default function RegisterPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error ?? '註冊失敗，請稍後再試')
+        setError(data.error ?? t('register.errorFailed'))
         return
       }
       setAuth({ email: data.user.email, name: data.user.name, token: data.token })
       navigate('/')
     } catch {
-      setError('網路錯誤，請稍後再試')
+      setError(t('register.errorNetwork'))
     } finally {
       setLoading(false)
     }
@@ -56,12 +58,12 @@ export default function RegisterPage() {
 
         {/* Card */}
         <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm p-8">
-          <h1 className="text-xl font-bold text-[#0f172a] mb-1">建立帳號</h1>
-          <p className="text-sm text-[#94a3b8] mb-6">開始記錄你的花費</p>
+          <h1 className="text-xl font-bold text-[#0f172a] mb-1">{t('register.title')}</h1>
+          <p className="text-sm text-[#94a3b8] mb-6">{t('register.subtitle')}</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-1.5">帳號</label>
+              <label className="block text-sm font-semibold text-[#374151] mb-1.5">{t('register.nameLabel')}</label>
               <input
                 type="text" value={name} onChange={e => setName(e.target.value)}
                 autoComplete="name"
@@ -70,7 +72,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-1.5">電子郵件</label>
+              <label className="block text-sm font-semibold text-[#374151] mb-1.5">{t('register.emailLabel')}</label>
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 autoComplete="email"
@@ -79,7 +81,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-1.5">密碼</label>
+              <label className="block text-sm font-semibold text-[#374151] mb-1.5">{t('register.passwordLabel')}</label>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
                 autoComplete="new-password"
@@ -88,7 +90,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-1.5">確認密碼</label>
+              <label className="block text-sm font-semibold text-[#374151] mb-1.5">{t('register.confirmLabel')}</label>
               <input
                 type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
                 autoComplete="new-password"
@@ -115,15 +117,15 @@ export default function RegisterPage() {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                 </svg>
               )}
-              {loading ? '建立中…' : '建立帳號'}
+              {loading ? t('register.submitting') : t('register.submit')}
             </button>
           </form>
         </div>
 
         <p className="text-center text-sm text-[#94a3b8] mt-6">
-          已有帳號？{' '}
+          {t('register.hasAccount')}{' '}
           <Link to="/login" className="text-[#0ea5e9] font-semibold hover:underline">
-            立即登入
+            {t('register.loginLink')}
           </Link>
         </p>
       </div>

@@ -1,0 +1,132 @@
+{
+  "common": {
+    "cancel": "取消",
+    "delete": "刪除",
+    "save": "儲存",
+    "add": "新增",
+    "edit": "編輯",
+    "loading": "載入中…",
+    "processing": "處理中…",
+    "deleting": "刪除中…",
+    "saveChanges": "儲存變更",
+    "uncategorized": "未分類",
+    "reload": "重新載入"
+  },
+  "app": {
+    "loadFailed": "載入失敗，請重新整理",
+    "showLeftPanel": "顯示左側欄",
+    "showRightPanel": "顯示右側欄"
+  },
+  "nav": {
+    "addExpense": "新增花費",
+    "logout": "登出"
+  },
+  "login": {
+    "title": "歡迎回來",
+    "subtitle": "登入以管理你的花費記錄",
+    "accountLabel": "帳號 / 電子郵件",
+    "passwordLabel": "密碼",
+    "submit": "登入",
+    "submitting": "登入中…",
+    "noAccount": "還沒有帳號？",
+    "registerLink": "立即註冊",
+    "errorFillAll": "請填寫所有欄位",
+    "errorCredentials": "帳號或密碼錯誤",
+    "errorNetwork": "網路錯誤，請稍後再試"
+  },
+  "register": {
+    "title": "建立帳號",
+    "subtitle": "開始記錄你的花費",
+    "nameLabel": "帳號",
+    "emailLabel": "電子郵件",
+    "passwordLabel": "密碼",
+    "confirmLabel": "確認密碼",
+    "submit": "建立帳號",
+    "submitting": "建立中…",
+    "hasAccount": "已有帳號？",
+    "loginLink": "立即登入",
+    "errorFillAll": "請填寫所有欄位",
+    "errorPasswordLength": "密碼至少需要 6 個字元",
+    "errorPasswordMismatch": "兩次輸入的密碼不一致",
+    "errorFailed": "註冊失敗，請稍後再試",
+    "errorNetwork": "網路錯誤，請稍後再試"
+  },
+  "expense": {
+    "addTitle": "新增花費",
+    "editTitle": "編輯花費",
+    "amountLabel": "金額",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "例：午餐、計程車、購物…",
+    "categoryLabel": "類別",
+    "dateLabel": "日期",
+    "noteLabel": "備註",
+    "notePlaceholder": "選填",
+    "errorAmount": "請輸入有效的金額",
+    "errorDescription": "請輸入描述",
+    "errorDate": "請選擇日期",
+    "addFailed": "新增失敗",
+    "saveFailed": "儲存失敗"
+  },
+  "category": {
+    "addTitle": "新增類別",
+    "editTitle": "編輯類別",
+    "nameLabel": "名稱",
+    "namePlaceholder": "例：餐飲、交通、娛樂…",
+    "colorLabel": "顏色",
+    "activeLabel": "啟用類別",
+    "activeHint": "停用後不顯示在篩選中",
+    "errorName": "請輸入類別名稱",
+    "addFailed": "新增失敗",
+    "saveFailed": "儲存失敗"
+  },
+  "deleteModal": {
+    "title": "確定要刪除？",
+    "expenseMessage": "「{{description}}」（{{amount}}）將被永久刪除",
+    "categoryMessage": "類別「{{name}}」將被刪除，相關花費改為未分類"
+  },
+  "leftSidebar": {
+    "overview": "總覽",
+    "totalExpenses": "總支出",
+    "count": "筆數",
+    "categoryCount": "類別數",
+    "categoryFilter": "類別篩選",
+    "clear": "清除",
+    "noCategories": "尚無類別",
+    "categoryStats": "分類統計"
+  },
+  "rightSidebar": {
+    "categoryManagement": "類別管理",
+    "noCategories": "尚無類別",
+    "commonKeywords": "常用關鍵字",
+    "addKeywordPlaceholder": "新增關鍵字…",
+    "noKeywords": "尚無關鍵字"
+  },
+  "expenseList": {
+    "allExpenses": "全部花費",
+    "expensesForDate": "{{date}} 的花費",
+    "expensesForCategory": "{{category}} 的花費",
+    "totalCount": "共 {{count}} 筆",
+    "clearDateFilter": "清除日期篩選",
+    "searchPlaceholder": "搜尋描述或類別…",
+    "sortNewest": "最新優先",
+    "sortAmount": "金額排序",
+    "noExpenses": "尚未記錄任何花費",
+    "noMatchingExpenses": "沒有符合條件的花費",
+    "startHint": "點擊右上角「新增花費」開始記帳",
+    "clearFilterHint": "試試清除篩選條件",
+    "addFirstExpense": "新增第一筆花費"
+  },
+  "charts": {
+    "total": "總計",
+    "noData": "尚無資料"
+  },
+  "calendar": {
+    "months": ["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
+    "weekdays": ["日","一","二","三","四","五","六"],
+    "yearMonth": "{{year}} 年 {{month}}",
+    "today": "今天",
+    "selectEndDate": "再選結束日期",
+    "clickToSelect": "點擊日期可選擇區間",
+    "clear": "清除"
+  }
+}

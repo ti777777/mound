@@ -1,9 +1,14 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Expense } from '../types'
-import { MONTHS, toDateStr } from '../utils'
+import { toDateStr } from '../utils'
 import { useDateRange } from '../contexts/DateRangeContext'
 
 export default function Calendar({ expenses }: { expenses: Expense[] }) {
+  const { t } = useTranslation()
+  const months = t('calendar.months', { returnObjects: true }) as string[]
+  const weekdays = t('calendar.weekdays', { returnObjects: true }) as string[]
+
   const { dateRange, setDateRange, clearDateRange } = useDateRange()
   const [{ year, month }, setCal] = useState(() => {
     const n = new Date()
@@ -60,15 +65,19 @@ export default function Calendar({ expenses }: { expenses: Expense[] }) {
           <button onClick={prev} className="p-1.5 rounded-lg hover:bg-[#f8fafc] transition-colors text-[#94a3b8] hover:text-slate-700">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
           </button>
-          <h2 className="text-sm font-bold text-slate-800 w-28 text-center">{year} 年 {MONTHS[month]}</h2>
+          <h2 className="text-sm font-bold text-slate-800 w-28 text-center">
+            {t('calendar.yearMonth', { year, month: months[month] })}
+          </h2>
           <button onClick={next} className="p-1.5 rounded-lg hover:bg-[#f8fafc] transition-colors text-[#94a3b8] hover:text-slate-700">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
           </button>
         </div>
-        <button onClick={goToday} className="text-xs font-semibold text-[#0ea5e9] border border-[#0ea5e9]/30 px-2.5 py-1 rounded-lg hover:bg-[#e0f2fe] transition-colors">今天</button>
+        <button onClick={goToday} className="text-xs font-semibold text-[#0ea5e9] border border-[#0ea5e9]/30 px-2.5 py-1 rounded-lg hover:bg-[#e0f2fe] transition-colors">
+          {t('calendar.today')}
+        </button>
       </div>
       <div className="grid grid-cols-7 border-b border-[#e2e8f0]">
-        {['日','一','二','三','四','五','六'].map((d, i) => (
+        {weekdays.map((d, i) => (
           <div key={d} className={`py-1.5 text-center text-xs font-bold ${i === 0 ? 'text-red-400' : i === 6 ? 'text-blue-400' : 'text-[#94a3b8]'}`}>{d}</div>
         ))}
       </div>
@@ -120,14 +129,14 @@ export default function Calendar({ expenses }: { expenses: Expense[] }) {
             {dateRange.end ? (
               <button onClick={clearDateRange} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                清除
+                {t('calendar.clear')}
               </button>
             ) : (
-              <span className="text-xs text-[#94a3b8]">再選結束日期</span>
+              <span className="text-xs text-[#94a3b8]">{t('calendar.selectEndDate')}</span>
             )}
           </>
         ) : (
-          <span className="text-xs text-[#94a3b8]">點擊日期可選擇區間</span>
+          <span className="text-xs text-[#94a3b8]">{t('calendar.clickToSelect')}</span>
         )}
       </div>
     </div>

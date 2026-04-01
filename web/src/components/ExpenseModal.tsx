@@ -1,21 +1,23 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { ExpenseForm, Category } from '../types'
 
-export default function ExpenseModal({ open, title, form, categories, keywords, onFormChange, onSubmit, onClose, submitting, apiError }: {
-  open: boolean; title: string; form: ExpenseForm
+export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, onFormChange, onSubmit, onClose, submitting, apiError }: {
+  open: boolean; title: string; isEdit?: boolean; form: ExpenseForm
   categories: Category[]
   keywords?: string[]
   onFormChange: (f: ExpenseForm) => void; onSubmit: () => void; onClose: () => void
   submitting?: boolean; apiError?: string | null
 }) {
+  const { t } = useTranslation()
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const validate = () => {
     const e: Record<string, string> = {}
     const amt = parseFloat(form.amount)
-    if (!form.amount || isNaN(amt) || amt <= 0) e.amount = '請輸入有效的金額'
-    if (!form.description.trim()) e.description = '請輸入描述'
-    if (!form.date) e.date = '請選擇日期'
+    if (!form.amount || isNaN(amt) || amt <= 0) e.amount = t('expense.errorAmount')
+    if (!form.description.trim()) e.description = t('expense.errorDescription')
+    if (!form.date) e.date = t('expense.errorDate')
     setErrors(e)
     return !Object.keys(e).length
   }
@@ -39,7 +41,7 @@ export default function ExpenseModal({ open, title, form, categories, keywords, 
           )}
           {/* Amount */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">金額 <span className="text-red-400">*</span></label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.amountLabel')} <span className="text-red-400">*</span></label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#94a3b8] font-semibold select-none">NT$</span>
               <input type="number" min="0" step="1" value={form.amount}
@@ -51,10 +53,10 @@ export default function ExpenseModal({ open, title, form, categories, keywords, 
           </div>
           {/* Description */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">描述 <span className="text-red-400">*</span></label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.descriptionLabel')} <span className="text-red-400">*</span></label>
             <input type="text" value={form.description}
               onChange={e => onFormChange({...form, description: e.target.value})}
-              placeholder="例：午餐、計程車、購物…"
+              placeholder={t('expense.descriptionPlaceholder')}
               className={`w-full bg-[#f8fafc] border rounded-xl py-2.5 px-4 text-sm focus:bg-white transition-colors outline-none ${errors.description ? 'border-red-300 focus:border-red-400' : 'border-[#e2e8f0] focus:border-[#0ea5e9]'}`}/>
             {errors.description && <p className="text-xs text-red-400 mt-1">{errors.description}</p>}
             {keywords && keywords.length > 0 && (
@@ -70,11 +72,11 @@ export default function ExpenseModal({ open, title, form, categories, keywords, 
           </div>
           {/* Category */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">類別</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.categoryLabel')}</label>
             <select value={form.categoryId ?? ''}
               onChange={e => onFormChange({...form, categoryId: e.target.value ? Number(e.target.value) : null})}
               className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none">
-              <option value="">未分類</option>
+              <option value="">{t('common.uncategorized')}</option>
               {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
@@ -82,7 +84,7 @@ export default function ExpenseModal({ open, title, form, categories, keywords, 
           </div>
           {/* Date */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">日期 <span className="text-red-400">*</span></label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.dateLabel')} <span className="text-red-400">*</span></label>
             <input type="date" value={form.date}
               onChange={e => onFormChange({...form, date: e.target.value})}
               className={`w-full bg-[#f8fafc] border rounded-xl py-2.5 px-4 text-sm focus:bg-white transition-colors outline-none ${errors.date ? 'border-red-300 focus:border-red-400' : 'border-[#e2e8f0] focus:border-[#0ea5e9]'}`}/>
@@ -90,9 +92,9 @@ export default function ExpenseModal({ open, title, form, categories, keywords, 
           </div>
           {/* Note */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-1.5">備註</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.noteLabel')}</label>
             <textarea value={form.note} onChange={e => onFormChange({...form, note: e.target.value})}
-              placeholder="選填"
+              placeholder={t('expense.notePlaceholder')}
               rows={2}
               className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none resize-none"/>
           </div>
@@ -100,11 +102,11 @@ export default function ExpenseModal({ open, title, form, categories, keywords, 
         <div className="px-6 py-4 border-t border-[#e2e8f0] flex justify-end gap-3">
           <button onClick={onClose} disabled={submitting}
             className="px-4 py-2 text-sm font-semibold text-slate-600 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl hover:bg-white transition-colors disabled:opacity-50">
-            取消
+            {t('common.cancel')}
           </button>
           <button onClick={handleSubmit} disabled={submitting}
             className="px-5 py-2 text-sm font-bold bg-[#0ea5e9] text-white rounded-xl hover:bg-[#0284c7] transition-colors disabled:opacity-60">
-            {submitting ? '處理中…' : title === '新增花費' ? '新增' : '儲存變更'}
+            {submitting ? t('common.processing') : isEdit ? t('common.saveChanges') : t('common.add')}
           </button>
         </div>
       </div>

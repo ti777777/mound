@@ -1,3 +1,4 @@
+import { t } from 'i18next'
 import type { Category, Expense, ExpenseForm, CategoryForm } from './types'
 
 export const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
@@ -34,7 +35,7 @@ export function apiExpenseToExpense(e: any, catsById: Map<number, Category>): Ex
   return {
     id: e.id,
     categoryId: e.category_id ?? null,
-    categoryName: cat?.name ?? '未分類',
+    categoryName: cat?.name ?? t('common.uncategorized'),
     categoryColor: cat?.color ?? '#94a3b8',
     amount: e.amount,
     description: e.description ?? '',

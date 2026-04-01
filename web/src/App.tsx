@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router'
+import { useTranslation } from 'react-i18next'
 import { authFetch, clearAuth } from './api'
 import type { Category, Expense, ExpenseForm, CategoryForm, ChartDatum } from './types'
 import { apiCategoryToCategory, apiExpenseToExpense, emptyExpenseForm, emptyCategoryForm, toDateStr, formatAmount } from './utils'
@@ -14,6 +15,7 @@ import { useDateRange } from './contexts/DateRangeContext'
 
 export default function App() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const auth = JSON.parse(localStorage.getItem('mound_auth') ?? '{}') as { email?: string; name?: string; token?: string }
   const { dateRange } = useDateRange()
 
@@ -78,7 +80,7 @@ export default function App() {
           authFetch('/api/expenses?size=500'),
         ])
         if (catsRes.status === 401 || expsRes.status === 401) { clearAuth(); navigate('/login'); return }
-        if (!catsRes.ok || !expsRes.ok) throw new Error('載入失敗，請重新整理')
+        if (!catsRes.ok || !expsRes.ok) throw new Error(t('app.loadFailed'))
         const catsData = await catsRes.json()
         const expsData = await expsRes.json()
         const parsedCats: Category[] = (catsData ?? []).map(apiCategoryToCategory)
@@ -149,7 +151,7 @@ export default function App() {
           note: addExpForm.note,
         }),
       })
-      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? '新增失敗') }
+      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? t('expense.addFailed')) }
       const catsById = new Map(categories.map(c => [c.id, c]))
       const newExp = apiExpenseToExpense(await res.json(), catsById)
       setExpenses(prev => [newExp, ...prev])
@@ -178,7 +180,7 @@ export default function App() {
           note: editExpForm.note,
         }),
       })
-      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? '儲存失敗') }
+      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? t('expense.saveFailed')) }
       const catsById = new Map(categories.map(c => [c.id, c]))
       const updated = apiExpenseToExpense(await res.json(), catsById)
       setExpenses(prev => prev.map(e => e.id === editExpense.id ? updated : e))
@@ -207,7 +209,7 @@ export default function App() {
         method: 'POST',
         body: JSON.stringify({ name: addCatForm.name, color: addCatForm.color, active: addCatForm.active }),
       })
-      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? '新增失敗') }
+      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? t('category.addFailed')) }
       const newCat = await res.json()
       setCategories(prev => [...prev, apiCategoryToCategory(newCat)])
       setAddCatOpen(false)
@@ -229,7 +231,7 @@ export default function App() {
         method: 'PUT',
         body: JSON.stringify({ name: editCatForm.name, color: editCatForm.color, active: editCatForm.active }),
       })
-      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? '儲存失敗') }
+      if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? t('category.saveFailed')) }
       const updated = apiCategoryToCategory(await res.json())
       setCategories(prev => prev.map(c => c.id === editCategory.id ? updated : c))
       setExpenses(prev => prev.map(e => e.categoryId === updated.id
@@ -247,7 +249,7 @@ export default function App() {
       await authFetch(`/api/categories/${deleteCategory.id}`, { method: 'DELETE' })
       setCategories(prev => prev.filter(c => c.id !== deleteCategory.id))
       setExpenses(prev => prev.map(e => e.categoryId === deleteCategory.id
-        ? { ...e, categoryId: null, categoryName: '未分類', categoryColor: '#94a3b8' } : e))
+        ? { ...e, categoryId: null, categoryName: t('common.uncategorized'), categoryColor: '#94a3b8' } : e))
     } catch { /* ignore */ }
     finally { setSubmitting(false); setDeleteCategory(null) }
   }
@@ -259,7 +261,7 @@ export default function App() {
       {apiError && (
         <div className="bg-red-50 border-b border-red-200 px-4 py-2 text-sm text-red-600 text-center">
           {apiError}
-          <button className="ml-3 underline" onClick={() => window.location.reload()}>重新載入</button>
+          <button className="ml-3 underline" onClick={() => window.location.reload()}>{t('common.reload')}</button>
         </div>
       )}
 
@@ -313,45 +315,45 @@ export default function App() {
       <button
         onClick={() => setLeftOpen(true)}
         className="lg:hidden fixed left-0 top-1/2 -translate-y-1/2 z-30 bg-white border border-[#e2e8f0] border-l-0 rounded-r-xl px-1.5 py-3 shadow-md text-[#94a3b8] hover:text-[#0ea5e9] hover:border-[#bae6fd] transition-colors"
-        title="顯示左側欄"
+        title={t('app.showLeftPanel')}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
       </button>
       <button
         onClick={() => setRightOpen(true)}
         className="xl:hidden fixed right-0 top-1/2 -translate-y-1/2 z-30 bg-white border border-[#e2e8f0] border-r-0 rounded-l-xl px-1.5 py-3 shadow-md text-[#94a3b8] hover:text-[#0ea5e9] hover:border-[#bae6fd] transition-colors"
-        title="顯示右側欄"
+        title={t('app.showRightPanel')}
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
       </button>
 
       {/* Modals */}
-      <ExpenseModal open={addExpOpen} title="新增花費"
+      <ExpenseModal open={addExpOpen} title={t('expense.addTitle')} isEdit={false}
         form={addExpForm} categories={categories} keywords={keywords}
         onFormChange={setAddExpForm} onSubmit={handleAddExpSubmit}
         onClose={() => setAddExpOpen(false)} submitting={submitting} apiError={formError}/>
 
-      <ExpenseModal open={editExpense !== null} title="編輯花費"
+      <ExpenseModal open={editExpense !== null} title={t('expense.editTitle')} isEdit={true}
         form={editExpForm} categories={categories} keywords={keywords}
         onFormChange={setEditExpForm} onSubmit={handleEditExpSubmit}
         onClose={() => setEditExpense(null)} submitting={submitting} apiError={formError}/>
 
-      <CategoryModal open={addCatOpen} title="新增類別"
+      <CategoryModal open={addCatOpen} title={t('category.addTitle')} isEdit={false}
         form={addCatForm} onFormChange={setAddCatForm}
         onSubmit={handleAddCatSubmit} onClose={() => setAddCatOpen(false)}
         submitting={submitting} apiError={formError}/>
 
-      <CategoryModal open={editCategory !== null} title="編輯類別"
+      <CategoryModal open={editCategory !== null} title={t('category.editTitle')} isEdit={true}
         form={editCatForm} onFormChange={setEditCatForm}
         onSubmit={handleEditCatSubmit} onClose={() => setEditCategory(null)}
         submitting={submitting} apiError={formError}/>
 
       <DeleteModal
-        message={deleteExpense ? `「${deleteExpense.description}」（${formatAmount(deleteExpense.amount)}）將被永久刪除` : null}
+        message={deleteExpense ? t('deleteModal.expenseMessage', { description: deleteExpense.description, amount: formatAmount(deleteExpense.amount) }) : null}
         onConfirm={handleDeleteExpConfirm} onClose={() => setDeleteExpense(null)} submitting={submitting}/>
 
       <DeleteModal
-        message={deleteCategory ? `類別「${deleteCategory.name}」將被刪除，相關花費改為未分類` : null}
+        message={deleteCategory ? t('deleteModal.categoryMessage', { name: deleteCategory.name }) : null}
         onConfirm={handleDeleteCatConfirm} onClose={() => setDeleteCategory(null)} submitting={submitting}/>
     </div>
   )

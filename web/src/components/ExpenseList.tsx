@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { Expense } from '../types'
 import ExpenseCard from './ExpenseCard'
 import { useDateRange } from '../contexts/DateRangeContext'
@@ -15,6 +16,7 @@ export default function ExpenseList({ loading, expenses, visibleExpenses, filter
   onEdit: (e: Expense) => void
   onDelete: (e: Expense) => void
 }) {
+  const { t } = useTranslation()
   const { dateRange, clearDateRange } = useDateRange()
   const fmtD = (s: string) => s.replace(/^(\d+)-(\d+)-(\d+)$/, '$1/$2/$3')
 
@@ -30,12 +32,14 @@ export default function ExpenseList({ loading, expenses, visibleExpenses, filter
         <div>
           <h3 className="font-bold text-slate-800">
             {dateLabel
-              ? `${dateLabel} 的花費`
-              : filterCategory ? `${filterCategory} 的花費` : '全部花費'}
+              ? t('expenseList.expensesForDate', { date: dateLabel })
+              : filterCategory
+                ? t('expenseList.expensesForCategory', { category: filterCategory })
+                : t('expenseList.allExpenses')}
           </h3>
           <p className="text-sm text-[#94a3b8] mt-0.5">
-            共 {visibleExpenses.length} 筆
-            {dateLabel && <> · <button onClick={clearDateRange} className="underline hover:text-[#0ea5e9]">清除日期篩選</button></>}
+            {t('expenseList.totalCount', { count: visibleExpenses.length })}
+            {dateLabel && <> · <button onClick={clearDateRange} className="underline hover:text-[#0ea5e9]">{t('expenseList.clearDateFilter')}</button></>}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -44,13 +48,13 @@ export default function ExpenseList({ loading, expenses, visibleExpenses, filter
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
             <input value={search} onChange={e => onSearch(e.target.value)}
-              placeholder="搜尋描述或類別…"
+              placeholder={t('expenseList.searchPlaceholder')}
               className="bg-white border border-[#e2e8f0] rounded-xl py-2 pl-9 pr-4 text-sm focus:border-[#0ea5e9] transition-colors outline-none w-44"/>
           </div>
           <select value={sort} onChange={e => onSort(e.target.value as 'date' | 'amount')}
             className="bg-white border border-[#e2e8f0] rounded-xl py-2 px-3 text-sm focus:border-[#0ea5e9] transition-colors text-slate-600 outline-none">
-            <option value="date">最新優先</option>
-            <option value="amount">金額排序</option>
+            <option value="date">{t('expenseList.sortNewest')}</option>
+            <option value="amount">{t('expenseList.sortAmount')}</option>
           </select>
         </div>
       </div>
@@ -70,16 +74,16 @@ export default function ExpenseList({ loading, expenses, visibleExpenses, filter
               </svg>
             </div>
             <p className="font-bold text-slate-700 mb-1">
-              {expenses.length === 0 ? '尚未記錄任何花費' : '沒有符合條件的花費'}
+              {expenses.length === 0 ? t('expenseList.noExpenses') : t('expenseList.noMatchingExpenses')}
             </p>
             <p className="text-sm text-[#94a3b8] mb-4">
-              {expenses.length === 0 ? '點擊右上角「新增花費」開始記帳' : '試試清除篩選條件'}
+              {expenses.length === 0 ? t('expenseList.startHint') : t('expenseList.clearFilterHint')}
             </p>
             {expenses.length === 0 && (
               <button onClick={onAddExpense}
                 className="inline-flex items-center gap-2 text-sm font-bold bg-[#0ea5e9] text-white px-5 py-2 rounded-xl hover:bg-[#0284c7] transition-colors">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-                新增第一筆花費
+                {t('expenseList.addFirstExpense')}
               </button>
             )}
           </div>

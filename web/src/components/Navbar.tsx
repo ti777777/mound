@@ -1,8 +1,18 @@
+import { useTranslation } from 'react-i18next'
+
 export default function Navbar({ auth, onAddExpense, onLogout }: {
   auth: { name?: string; email?: string }
   onAddExpense: () => void
   onLogout: () => void
 }) {
+  const { t, i18n } = useTranslation()
+
+  const toggleLang = () => {
+    const next = i18n.language === 'zh-TW' ? 'en' : 'zh-TW'
+    i18n.changeLanguage(next)
+    localStorage.setItem('mound_lang', next)
+  }
+
   return (
     <header className="bg-white border-b border-[#e2e8f0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center gap-3 h-14">
@@ -15,10 +25,14 @@ export default function Navbar({ auth, onAddExpense, onLogout }: {
           <span className="font-black text-lg tracking-tight">Mound</span>
         </a>
         <div className="flex-1"/>
+        <button onClick={toggleLang}
+          className="text-xs font-bold px-2.5 py-1.5 rounded-lg border border-[#e2e8f0] text-[#475569] hover:text-[#0ea5e9] hover:border-[#bae6fd] transition-colors">
+          {i18n.language === 'zh-TW' ? 'EN' : '中'}
+        </button>
         <button onClick={onAddExpense}
           className="flex items-center gap-2 text-sm font-bold bg-[#0ea5e9] text-white px-4 py-1.5 rounded-xl hover:bg-[#0284c7] transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          新增花費
+          {t('nav.addExpense')}
         </button>
         <div className="flex items-center gap-2 pl-3 border-l border-[#e2e8f0]">
           <div className="w-8 h-8 rounded-full bg-[#e0f2fe] flex items-center justify-center text-[#0ea5e9] font-bold text-sm">
@@ -27,7 +41,7 @@ export default function Navbar({ auth, onAddExpense, onLogout }: {
           <span className="hidden sm:block text-sm text-[#475569] max-w-[120px] truncate">
             {auth.name ?? auth.email}
           </span>
-          <button onClick={onLogout} title="登出"
+          <button onClick={onLogout} title={t('nav.logout')}
             className="ml-1 p-1.5 rounded-lg text-[#94a3b8] hover:text-[#0ea5e9] hover:bg-[#e0f2fe] transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M18 15l3-3m0 0l-3-3m3 3H9"/>

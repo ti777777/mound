@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next'
 import type { ChartDatum } from '../types'
 
 export function DonutChart({ data }: { data: ChartDatum[] }) {
+  const { t } = useTranslation()
   const total = data.reduce((s, d) => s + d.total, 0)
-  if (total === 0) return <p className="text-xs text-[#94a3b8] text-center py-3">尚無資料</p>
+  if (total === 0) return <p className="text-xs text-[#94a3b8] text-center py-3">{t('charts.noData')}</p>
 
   const cx = 60, cy = 60, R = 50, r = 30
   let angle = -Math.PI / 2
@@ -32,7 +34,7 @@ export function DonutChart({ data }: { data: ChartDatum[] }) {
         <path key={s.name} d={arc(s.sa, s.ea)} fill={s.color}
           stroke="white" strokeWidth={s.sweep < 0.15 ? 0 : 1}/>
       ))}
-      <text x={cx} y={cy - 5} textAnchor="middle" fill="#64748b" fontSize="8" fontWeight="600">總計</text>
+      <text x={cx} y={cy - 5} textAnchor="middle" fill="#64748b" fontSize="8" fontWeight="600">{t('charts.total')}</text>
       <text x={cx} y={cy + 7} textAnchor="middle" fill="#0f172a" fontSize="10" fontWeight="700">
         {fmt(total)}
       </text>

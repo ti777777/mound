@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router'
+import { useTranslation } from 'react-i18next'
 import { setAuth } from '../api'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -13,7 +15,7 @@ export default function LoginPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError('')
-    if (!identifier || !password) { setError('請填寫所有欄位'); return }
+    if (!identifier || !password) { setError(t('login.errorFillAll')); return }
 
     setLoading(true)
     try {
@@ -24,13 +26,13 @@ export default function LoginPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error ?? '帳號或密碼錯誤')
+        setError(data.error ?? t('login.errorCredentials'))
         return
       }
       setAuth({ email: data.user.email, name: data.user.name, token: data.token })
       navigate('/')
     } catch {
-      setError('網路錯誤，請稍後再試')
+      setError(t('login.errorNetwork'))
     } finally {
       setLoading(false)
     }
@@ -51,12 +53,12 @@ export default function LoginPage() {
 
         {/* Card */}
         <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm p-8">
-          <h1 className="text-xl font-bold text-[#0f172a] mb-1">歡迎回來</h1>
-          <p className="text-sm text-[#94a3b8] mb-6">登入以管理你的花費記錄</p>
+          <h1 className="text-xl font-bold text-[#0f172a] mb-1">{t('login.title')}</h1>
+          <p className="text-sm text-[#94a3b8] mb-6">{t('login.subtitle')}</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#374151] mb-1.5">帳號 / 電子郵件</label>
+              <label className="block text-sm font-semibold text-[#374151] mb-1.5">{t('login.accountLabel')}</label>
               <input
                 type="text" value={identifier} onChange={e => setIdentifier(e.target.value)}
                 autoComplete="username"
@@ -66,7 +68,7 @@ export default function LoginPage() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-semibold text-[#374151]">密碼</label>
+                <label className="block text-sm font-semibold text-[#374151]">{t('login.passwordLabel')}</label>
               </div>
               <input
                 type="password" value={password} onChange={e => setPassword(e.target.value)}
@@ -94,15 +96,15 @@ export default function LoginPage() {
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                 </svg>
               )}
-              {loading ? '登入中…' : '登入'}
+              {loading ? t('login.submitting') : t('login.submit')}
             </button>
           </form>
         </div>
 
         <p className="text-center text-sm text-[#94a3b8] mt-6">
-          還沒有帳號？{' '}
+          {t('login.noAccount')}{' '}
           <Link to="/register" className="text-[#0ea5e9] font-semibold hover:underline">
-            立即註冊
+            {t('login.registerLink')}
           </Link>
         </p>
       </div>
