@@ -19,7 +19,15 @@
   },
   "nav": {
     "addExpense": "新增花費",
-    "logout": "登出"
+    "logout": "登出",
+    "settings": "設定",
+    "about": "關於"
+  },
+  "settings": {
+    "language": "語言"
+  },
+  "about": {
+    "description": "簡單、直覺的個人花費記帳工具"
   },
   "login": {
     "title": "歡迎回來",

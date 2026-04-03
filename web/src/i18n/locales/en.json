@@ -19,7 +19,15 @@
   },
   "nav": {
     "addExpense": "Add Expense",
-    "logout": "Logout"
+    "logout": "Logout",
+    "settings": "Settings",
+    "about": "About"
+  },
+  "settings": {
+    "language": "Language"
+  },
+  "about": {
+    "description": "A simple and intuitive personal expense tracker"
   },
   "login": {
     "title": "Welcome back",
