@@ -2,7 +2,13 @@ import { t } from 'i18next'
 import type { Category, Expense, ExpenseForm, CategoryForm } from './types'
 
 export const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
-export const PRESET_COLORS = ['#0ea5e9','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16']
+export const PRESET_COLORS = [
+  '#0ea5e9','#3b82f6','#6366f1','#06b6d4',
+  '#10b981','#22c55e','#84cc16','#14b8a6',
+  '#f59e0b','#f97316','#ef4444','#e11d48',
+  '#8b5cf6','#a855f7','#ec4899','#db2777',
+  '#64748b','#475569','#78716c','#0f172a',
+]
 
 export function toDateStr(ts: number): string {
   const d = new Date(ts)
