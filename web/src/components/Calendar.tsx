@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Expense } from '../types'
 import { toDateStr } from '../utils'
-import { useDateRange } from '../contexts/DateRangeContext'
+import { useFilter } from '../contexts/FilterContext'
 
 export default function Calendar({ expenses }: { expenses: Expense[] }) {
   const { t } = useTranslation()
   const months = t('calendar.months', { returnObjects: true }) as string[]
   const weekdays = t('calendar.weekdays', { returnObjects: true }) as string[]
 
-  const { dateRange, setDateRange, clearDateRange } = useDateRange()
+  const { dateRange, setDateRange, clearDateRange } = useFilter()
   const [{ year, month }, setCal] = useState(() => {
     const n = new Date()
     return { year: n.getFullYear(), month: n.getMonth() }

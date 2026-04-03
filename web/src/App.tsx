@@ -11,13 +11,13 @@ import RightSidebar from './components/RightSidebar'
 import ExpenseModal from './components/ExpenseModal'
 import CategoryModal from './components/CategoryModal'
 import DeleteModal from './components/DeleteModal'
-import { useDateRange } from './contexts/DateRangeContext'
+import { useFilter } from './contexts/FilterContext'
 
 export default function App() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const auth = JSON.parse(localStorage.getItem('mound_auth') ?? '{}') as { email?: string; name?: string; token?: string }
-  const { dateRange } = useDateRange()
+  const { dateRange, filterCategories, toggleFilterCategory, clearFilterCategories, keyword, setKeyword } = useFilter()
 
   async function handleLogout() {
     try { await authFetch('/api/auth/logout', { method: 'POST' }) } catch { /* noop */ }
@@ -29,8 +29,6 @@ export default function App() {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState<string | null>(null)
-  const [filterCategory, setFilterCategory] = useState<string | null>(null)
-  const [search, setSearch] = useState('')
   const [sort, setSort] = useState<'date' | 'amount'>('date')
 
   // Expense modals
@@ -122,11 +120,19 @@ export default function App() {
     }),
     [expenses, dateRange]
   )
-  const rangeTotal = rangeExpenses.reduce((s, e) => s + e.amount, 0)
+
+  const categoryFilteredExpenses = useMemo(() =>
+    filterCategories.length === 0
+      ? rangeExpenses
+      : rangeExpenses.filter(e => filterCategories.includes(e.categoryName)),
+    [rangeExpenses, filterCategories]
+  )
+
+  const rangeTotal = categoryFilteredExpenses.reduce((s, e) => s + e.amount, 0)
 
   const categoryTotals = useMemo<ChartDatum[]>(() => {
     const map = new Map<string, { color: string; total: number }>()
-    rangeExpenses.forEach(e => {
+    categoryFilteredExpenses.forEach(e => {
       const key = e.categoryName
       const cur = map.get(key)
       if (cur) cur.total += e.amount
@@ -135,14 +141,13 @@ export default function App() {
     return Array.from(map.entries())
       .map(([name, { color, total }]) => ({ name, color, total }))
       .sort((a, b) => b.total - a.total)
-  }, [rangeExpenses])
+  }, [categoryFilteredExpenses])
 
   // Filtered list
-  const visibleExpenses = rangeExpenses
+  const visibleExpenses = categoryFilteredExpenses
     .filter(e => {
-      if (filterCategory && e.categoryName !== filterCategory) return false
-      if (search) {
-        const q = search.toLowerCase()
+      if (keyword) {
+        const q = keyword.toLowerCase()
         if (!e.description.toLowerCase().includes(q) && !e.categoryName.toLowerCase().includes(q)) return false
       }
       return true
@@ -287,8 +292,6 @@ export default function App() {
             rangeCount={rangeExpenses.length}
             categoriesCount={categories.length}
             activeCategories={activeCategories}
-            filterCategory={filterCategory}
-            onFilterCategory={setFilterCategory}
             categoryTotals={categoryTotals}
           />
 
@@ -296,10 +299,7 @@ export default function App() {
             loading={loading}
             expenses={expenses}
             visibleExpenses={visibleExpenses}
-            filterCategory={filterCategory}
-            search={search}
             sort={sort}
-            onSearch={setSearch}
             onSort={setSort}
             onAddExpense={handleAddExpOpen}
             onEdit={handleEditExpOpen}

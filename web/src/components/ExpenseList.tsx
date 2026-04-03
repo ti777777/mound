@@ -1,23 +1,20 @@
 import { useTranslation } from 'react-i18next'
 import type { Expense } from '../types'
 import ExpenseCard from './ExpenseCard'
-import { useDateRange } from '../contexts/DateRangeContext'
+import { useFilter } from '../contexts/FilterContext'
 
-export default function ExpenseList({ loading, expenses, visibleExpenses, filterCategory, search, sort, onSearch, onSort, onAddExpense, onEdit, onDelete }: {
+export default function ExpenseList({ loading, expenses, visibleExpenses, sort, onSort, onAddExpense, onEdit, onDelete }: {
   loading: boolean
   expenses: Expense[]
   visibleExpenses: Expense[]
-  filterCategory: string | null
-  search: string
   sort: 'date' | 'amount'
-  onSearch: (v: string) => void
   onSort: (v: 'date' | 'amount') => void
   onAddExpense: () => void
   onEdit: (e: Expense) => void
   onDelete: (e: Expense) => void
 }) {
   const { t } = useTranslation()
-  const { dateRange, clearDateRange } = useDateRange()
+  const { dateRange, clearDateRange, filterCategories, clearFilterCategories, keyword, setKeyword } = useFilter()
   const fmtD = (s: string) => s.replace(/^(\d+)-(\d+)-(\d+)$/, '$1/$2/$3')
 
   const dateLabel = (() => {
@@ -33,13 +30,14 @@ export default function ExpenseList({ loading, expenses, visibleExpenses, filter
           <h3 className="font-bold text-slate-800">
             {dateLabel
               ? t('expenseList.expensesForDate', { date: dateLabel })
-              : filterCategory
-                ? t('expenseList.expensesForCategory', { category: filterCategory })
+              : filterCategories.length > 0
+                ? t('expenseList.expensesForCategory', { category: filterCategories.join(', ') })
                 : t('expenseList.allExpenses')}
           </h3>
           <p className="text-sm text-[#94a3b8] mt-0.5">
             {t('expenseList.totalCount', { count: visibleExpenses.length })}
             {dateLabel && <> · <button onClick={clearDateRange} className="underline hover:text-[#0ea5e9]">{t('expenseList.clearDateFilter')}</button></>}
+            {filterCategories.length > 0 && <> · <button onClick={clearFilterCategories} className="underline hover:text-[#0ea5e9]">{t('leftSidebar.clear')}</button></>}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -47,7 +45,7 @@ export default function ExpenseList({ loading, expenses, visibleExpenses, filter
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
-            <input value={search} onChange={e => onSearch(e.target.value)}
+            <input value={keyword} onChange={e => setKeyword(e.target.value)}
               placeholder={t('expenseList.searchPlaceholder')}
               className="bg-white border border-[#e2e8f0] rounded-xl py-2 pl-9 pr-4 text-sm focus:border-[#0ea5e9] transition-colors outline-none w-44"/>
           </div>

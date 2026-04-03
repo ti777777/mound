@@ -1,19 +1,19 @@
 import { useTranslation } from 'react-i18next'
 import type { Category, ChartDatum } from '../types'
 import { DonutChart, BarChart } from './Charts'
+import { useFilter } from '../contexts/FilterContext'
 
-export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, categoriesCount, activeCategories, filterCategory, onFilterCategory, categoryTotals }: {
+export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, categoriesCount, activeCategories, categoryTotals }: {
   open: boolean
   onClose: () => void
   rangeTotal: number
   rangeCount: number
   categoriesCount: number
   activeCategories: Category[]
-  filterCategory: string | null
-  onFilterCategory: (cat: string | null) => void
   categoryTotals: ChartDatum[]
 }) {
   const { t } = useTranslation()
+  const { filterCategories, toggleFilterCategory, clearFilterCategories } = useFilter()
   return (
     <>
       {open && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={onClose}/>}
@@ -40,17 +40,17 @@ export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, cat
         <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
           <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between">
             <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">{t('leftSidebar.categoryFilter')}</p>
-            <button onClick={() => onFilterCategory(null)} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors">{t('leftSidebar.clear')}</button>
+            <button onClick={clearFilterCategories} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors">{t('leftSidebar.clear')}</button>
           </div>
           <div className="p-3 flex flex-wrap gap-2">
             {activeCategories.length === 0
               ? <span className="text-xs text-[#94a3b8]">{t('leftSidebar.noCategories')}</span>
               : activeCategories.map(c => (
-                <button key={c.id} onClick={() => onFilterCategory(filterCategory === c.name ? null : c.name)}
+                <button key={c.id} onClick={() => toggleFilterCategory(c.name)}
                   className={`text-xs font-semibold px-2.5 py-1 rounded-full border transition-colors ${
-                    filterCategory === c.name ? 'text-white border-transparent' : 'bg-[#f8fafc] text-slate-600 border-[#e2e8f0] hover:border-[#0ea5e9] hover:text-[#0ea5e9]'
+                    filterCategories.includes(c.name) ? 'text-white border-transparent' : 'bg-[#f8fafc] text-slate-600 border-[#e2e8f0] hover:border-[#0ea5e9] hover:text-[#0ea5e9]'
                   }`}
-                  style={filterCategory === c.name ? { background: c.color, borderColor: c.color } : {}}>
+                  style={filterCategories.includes(c.name) ? { background: c.color, borderColor: c.color } : {}}>
                   {c.name}
                 </button>
               ))
