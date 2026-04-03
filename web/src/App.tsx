@@ -17,7 +17,7 @@ export default function App() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [auth, setAuthInfo] = useState<{ email?: string; name?: string }>({})
-  const { dateRange, filterCategories, toggleFilterCategory, clearFilterCategories, keyword, setKeyword } = useFilter()
+  const { dateRange, filterCategories, keyword } = useFilter()
 
   async function handleLogout() {
     try { await authFetch('/api/auth/logout', { method: 'POST' }) } catch { /* noop */ }
