@@ -3,7 +3,6 @@ package middleware
 import (
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -36,12 +35,11 @@ func GenerateToken(userID uint, email string) (string, error) {
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		raw := c.GetHeader("Authorization")
-		if !strings.HasPrefix(raw, "Bearer ") {
+		tokenStr, err := c.Cookie("mound_token")
+		if err != nil || tokenStr == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing token"})
 			return
 		}
-		tokenStr := strings.TrimPrefix(raw, "Bearer ")
 
 		claims := &Claims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (any, error) {

@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router'
 import './i18n'
@@ -8,16 +8,26 @@ import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import { FilterProvider } from './contexts/FilterContext.tsx'
 
-function isLoggedIn() {
-  return !!localStorage.getItem('mound_auth')
-}
-
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  return isLoggedIn() ? <>{children}</> : <Navigate to="/login" replace />
+  const [status, setStatus] = useState<'loading' | 'ok' | 'no'>('loading')
+  useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => setStatus(r.ok ? 'ok' : 'no'))
+      .catch(() => setStatus('no'))
+  }, [])
+  if (status === 'loading') return null
+  return status === 'ok' ? <>{children}</> : <Navigate to="/login" replace />
 }
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  return isLoggedIn() ? <Navigate to="/" replace /> : <>{children}</>
+  const [status, setStatus] = useState<'loading' | 'ok' | 'no'>('loading')
+  useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => setStatus(r.ok ? 'ok' : 'no'))
+      .catch(() => setStatus('no'))
+  }, [])
+  if (status === 'loading') return null
+  return status === 'ok' ? <Navigate to="/" replace /> : <>{children}</>
 }
 
 createRoot(document.getElementById('root')!).render(

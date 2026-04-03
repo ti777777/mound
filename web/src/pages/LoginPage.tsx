@@ -2,7 +2,6 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { setAuth } from '../api'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -21,6 +20,7 @@ export default function LoginPage() {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ identifier, password }),
       })
@@ -29,7 +29,6 @@ export default function LoginPage() {
         setError(data.error ?? t('login.errorCredentials'))
         return
       }
-      setAuth({ email: data.user.email, name: data.user.name, token: data.token })
       navigate('/')
     } catch {
       setError(t('login.errorNetwork'))

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { authFetch, clearAuth } from './api'
+import { authFetch } from './api'
 import type { Category, Expense, ExpenseForm, CategoryForm, ChartDatum } from './types'
 import { apiCategoryToCategory, apiExpenseToExpense, emptyExpenseForm, emptyCategoryForm, toDateStr, formatAmount } from './utils'
 import Navbar from './components/Navbar'
@@ -16,12 +16,11 @@ import { useFilter } from './contexts/FilterContext'
 export default function App() {
   const navigate = useNavigate()
   const { t } = useTranslation()
-  const auth = JSON.parse(localStorage.getItem('mound_auth') ?? '{}') as { email?: string; name?: string; token?: string }
+  const [auth, setAuthInfo] = useState<{ email?: string; name?: string }>({})
   const { dateRange, filterCategories, toggleFilterCategory, clearFilterCategories, keyword, setKeyword } = useFilter()
 
   async function handleLogout() {
     try { await authFetch('/api/auth/logout', { method: 'POST' }) } catch { /* noop */ }
-    clearAuth()
     navigate('/login')
   }
 
@@ -86,11 +85,16 @@ export default function App() {
     async function loadData() {
       setLoading(true); setApiError(null)
       try {
-        const [catsRes, expsRes] = await Promise.all([
+        const [catsRes, expsRes, meRes] = await Promise.all([
           authFetch('/api/categories'),
           authFetch('/api/expenses?size=500'),
+          authFetch('/api/auth/me'),
         ])
-        if (catsRes.status === 401 || expsRes.status === 401) { clearAuth(); navigate('/login'); return }
+        if (catsRes.status === 401 || expsRes.status === 401) { navigate('/login'); return }
+        if (meRes.ok) {
+          const me = await meRes.json() as { email: string; name: string }
+          setAuthInfo({ email: me.email, name: me.name })
+        }
         if (!catsRes.ok || !expsRes.ok) throw new Error(t('app.loadFailed'))
         const catsData = await catsRes.json()
         const expsData = await expsRes.json()

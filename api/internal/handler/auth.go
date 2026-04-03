@@ -15,6 +15,11 @@ type registerReq struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+func setTokenCookie(c *gin.Context, token string) {
+	c.SetSameSite(http.SameSiteStrictMode)
+	c.SetCookie("mound_token", token, 0, "/", "", false, true)
+}
+
 func Register(c *gin.Context) {
 	var req registerReq
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -45,9 +50,9 @@ func Register(c *gin.Context) {
 	}
 
 	token, _ := middleware.GenerateToken(user.ID, user.Email)
+	setTokenCookie(c, token)
 	c.JSON(http.StatusCreated, gin.H{
-		"token": token,
-		"user":  gin.H{"id": user.ID, "name": user.Name, "email": user.Email},
+		"user": gin.H{"id": user.ID, "name": user.Name, "email": user.Email},
 	})
 }
 
@@ -75,15 +80,15 @@ func Login(c *gin.Context) {
 	}
 
 	token, _ := middleware.GenerateToken(user.ID, user.Email)
+	setTokenCookie(c, token)
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
-		"user":  gin.H{"id": user.ID, "name": user.Name, "email": user.Email},
+		"user": gin.H{"id": user.ID, "name": user.Name, "email": user.Email},
 	})
 }
 
 func Logout(c *gin.Context) {
-	// JWT is stateless; client drops the token.
-	// For token revocation, add a blocklist (Redis/DB) here.
+	c.SetSameSite(http.SameSiteStrictMode)
+	c.SetCookie("mound_token", "", -1, "/", "", false, true)
 	c.JSON(http.StatusOK, gin.H{"message": "logged out"})
 }
 

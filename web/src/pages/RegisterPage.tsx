@@ -2,7 +2,6 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router'
 import { useTranslation } from 'react-i18next'
-import { setAuth } from '../api'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -26,6 +25,7 @@ export default function RegisterPage() {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       })
@@ -34,7 +34,6 @@ export default function RegisterPage() {
         setError(data.error ?? t('register.errorFailed'))
         return
       }
-      setAuth({ email: data.user.email, name: data.user.name, token: data.token })
       navigate('/')
     } catch {
       setError(t('register.errorNetwork'))
