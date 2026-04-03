@@ -32,7 +32,7 @@ export default function Navbar({ auth, onAddExpense, onLogout }: {
         <button onClick={onAddExpense}
           className="flex items-center gap-2 text-sm font-bold bg-[#0ea5e9] text-white px-4 py-1.5 rounded-xl hover:bg-[#0284c7] transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          {t('nav.addExpense')}
+          <span className='hidden sm:inline'>{t('nav.addExpense')}</span>
         </button>
         <div className="flex items-center gap-2 pl-3 border-l border-[#e2e8f0]">
           <div className="w-8 h-8 rounded-full bg-[#e0f2fe] flex items-center justify-center text-[#0ea5e9] font-bold text-sm">
