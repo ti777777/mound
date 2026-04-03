@@ -125,7 +125,8 @@
     "noMatchingExpenses": "沒有符合條件的花費",
     "startHint": "點擊右上角「新增花費」開始記帳",
     "clearFilterHint": "試試清除篩選條件",
-    "addFirstExpense": "新增第一筆花費"
+    "addFirstExpense": "新增第一筆花費",
+    "loadMore": "載入更多（還有 {{remaining}} 筆）"
   },
   "charts": {
     "total": "總計",

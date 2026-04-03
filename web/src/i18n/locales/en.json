@@ -125,7 +125,8 @@
     "noMatchingExpenses": "No matching expenses",
     "startHint": "Click \"Add Expense\" to start tracking",
     "clearFilterHint": "Try clearing filters",
-    "addFirstExpense": "Add First Expense"
+    "addFirstExpense": "Add First Expense",
+    "loadMore": "Load more ({{remaining}} remaining)"
   },
   "charts": {
     "total": "Total",

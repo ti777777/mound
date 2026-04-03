@@ -1,7 +1,10 @@
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Expense } from '../types'
 import ExpenseCard from './ExpenseCard'
 import { useFilter } from '../contexts/FilterContext'
+
+const PAGE_SIZE = 5
 
 export default function ExpenseList({ loading, expenses, visibleExpenses, sort, onSort, onAddExpense, onEdit, onDelete }: {
   loading: boolean
@@ -16,6 +19,12 @@ export default function ExpenseList({ loading, expenses, visibleExpenses, sort, 
   const { t } = useTranslation()
   const { dateRange, clearDateRange, filterCategories, clearFilterCategories, keyword, setKeyword } = useFilter()
   const fmtD = (s: string) => s.replace(/^(\d+)-(\d+)-(\d+)$/, '$1/$2/$3')
+
+  const [displayCount, setDisplayCount] = useState(PAGE_SIZE)
+  useEffect(() => { setDisplayCount(PAGE_SIZE) }, [visibleExpenses.length, keyword, dateRange, filterCategories, sort])
+
+  const displayedExpenses = visibleExpenses.slice(0, displayCount)
+  const hasMore = visibleExpenses.length > displayCount
 
   const dateLabel = (() => {
     if (!dateRange.start) return null
@@ -85,11 +94,22 @@ export default function ExpenseList({ loading, expenses, visibleExpenses, sort, 
               </button>
             )}
           </div>
-        ) : visibleExpenses.map((exp, i) => (
-          <div key={exp.id} style={{ animationDelay: `${i * 40}ms` }}>
-            <ExpenseCard expense={exp} onEdit={onEdit} onDelete={onDelete}/>
-          </div>
-        ))}
+        ) : (
+          <>
+            {displayedExpenses.map((exp, i) => (
+              <div key={exp.id} style={{ animationDelay: `${i * 40}ms` }}>
+                <ExpenseCard expense={exp} onEdit={onEdit} onDelete={onDelete}/>
+              </div>
+            ))}
+            {hasMore && (
+              <button
+                onClick={() => setDisplayCount(c => c + PAGE_SIZE)}
+                className="w-full py-3 rounded-2xl border border-[#e2e8f0] bg-white text-sm font-medium text-[#0ea5e9] hover:bg-[#f0f9ff] hover:border-[#0ea5e9] transition-colors">
+                {t('expenseList.loadMore', { remaining: visibleExpenses.length - displayCount })}
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   )
