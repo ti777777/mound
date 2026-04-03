@@ -13,7 +13,8 @@ export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, cat
   categoryTotals: ChartDatum[]
 }) {
   const { t } = useTranslation()
-  const { filterCategories, toggleFilterCategory, clearFilterCategories } = useFilter()
+  const { filterCategories, toggleFilterCategory, clearFilterCategories, selectAllFilterCategories } = useFilter()
+  const allSelected = activeCategories.length > 0 && activeCategories.every(c => filterCategories.includes(c.name))
   return (
     <>
       {open && <div className="lg:hidden fixed inset-0 z-40 bg-black/40" onClick={onClose}/>}
@@ -40,7 +41,14 @@ export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, cat
         <div className="bg-white rounded-2xl border border-[#e2e8f0] overflow-hidden">
           <div className="px-4 py-3 border-b border-[#e2e8f0] flex items-center justify-between">
             <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">{t('leftSidebar.categoryFilter')}</p>
-            <button onClick={clearFilterCategories} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors">{t('leftSidebar.clear')}</button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => allSelected ? clearFilterCategories() : selectAllFilterCategories(activeCategories.map(c => c.name))}
+                className={`text-xs transition-colors ${allSelected ? 'text-[#0ea5e9]' : 'text-[#94a3b8] hover:text-[#0ea5e9]'}`}
+              >{t('leftSidebar.selectAll')}</button>
+              <span className="text-[#e2e8f0]">|</span>
+              <button onClick={clearFilterCategories} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors">{t('leftSidebar.clear')}</button>
+            </div>
           </div>
           <div className="p-3 flex flex-wrap gap-2">
             {activeCategories.length === 0

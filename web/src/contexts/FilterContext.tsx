@@ -13,6 +13,7 @@ interface FilterCtx {
   filterCategories: string[]
   toggleFilterCategory: (cat: string) => void
   clearFilterCategories: () => void
+  selectAllFilterCategories: (cats: string[]) => void
   keyword: string
   setKeyword: (kw: string) => void
   clearAllFilters: () => void
@@ -31,6 +32,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
       prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
     )
   const clearFilterCategories = () => setFilterCategories([])
+  const selectAllFilterCategories = (cats: string[]) => setFilterCategories(cats)
   const clearAllFilters = () => {
     setDateRange({ start: null, end: null })
     setFilterCategories([])
@@ -38,7 +40,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <Ctx.Provider value={{ dateRange, setDateRange, clearDateRange, filterCategories, toggleFilterCategory, clearFilterCategories, keyword, setKeyword, clearAllFilters }}>
+    <Ctx.Provider value={{ dateRange, setDateRange, clearDateRange, filterCategories, toggleFilterCategory, clearFilterCategories, selectAllFilterCategories, keyword, setKeyword, clearAllFilters }}>
       {children}
     </Ctx.Provider>
   )
