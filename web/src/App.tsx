@@ -53,6 +53,19 @@ export default function App() {
   const [leftOpen, setLeftOpen] = useState(false)
   const [rightOpen, setRightOpen] = useState(false)
 
+  // CSV Export
+  const handleExportCSV = async () => {
+    const res = await authFetch('/api/expenses/export')
+    if (!res.ok) return
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `mound-expenses-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   // Keywords
   const [keywords, setKeywords] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem('mound_keywords') ?? '[]') } catch { return [] }
@@ -256,7 +269,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-      <Navbar auth={auth} onAddExpense={handleAddExpOpen} onLogout={handleLogout}/>
+      <Navbar auth={auth} onAddExpense={handleAddExpOpen} onLogout={handleLogout} onExportCSV={handleExportCSV}/>
 
       {apiError && (
         <div className="bg-red-50 border-b border-red-200 px-4 py-2 text-sm text-red-600 text-center">

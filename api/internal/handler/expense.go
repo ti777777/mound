@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/csv"
 	"net/http"
 	"strconv"
 	"time"
@@ -168,6 +169,39 @@ func UpdateExpense(c *gin.Context) {
 	model.DB.Save(&exp)
 	model.DB.Preload("Category").First(&exp, exp.ID)
 	c.JSON(http.StatusOK, exp)
+}
+
+func ExportExpensesCSV(c *gin.Context) {
+	uid := middleware.CurrentUserID(c)
+	var expenses []model.Expense
+	model.DB.
+		Where("user_id = ?", uid).
+		Preload("Category").
+		Order("date DESC").
+		Find(&expenses)
+
+	c.Header("Content-Type", "text/csv; charset=utf-8")
+	c.Header("Content-Disposition", `attachment; filename="mound-expenses.csv"`)
+
+	// UTF-8 BOM for Excel compatibility
+	c.Writer.Write([]byte{0xEF, 0xBB, 0xBF})
+
+	w := csv.NewWriter(c.Writer)
+	w.Write([]string{"Date", "Description", "Category", "Amount", "Note"})
+	for _, e := range expenses {
+		catName := ""
+		if e.Category != nil {
+			catName = e.Category.Name
+		}
+		w.Write([]string{
+			e.Date.Format("2006-01-02"),
+			e.Description,
+			catName,
+			strconv.FormatFloat(e.Amount, 'f', -1, 64),
+			e.Note,
+		})
+	}
+	w.Flush()
 }
 
 func DeleteExpense(c *gin.Context) {

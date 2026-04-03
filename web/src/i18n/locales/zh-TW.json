@@ -24,7 +24,9 @@
     "about": "關於"
   },
   "settings": {
-    "language": "語言"
+    "language": "語言",
+    "exportCsv": "匯出 CSV",
+    "exportCsvDesc": "將所有花費記錄下載為 CSV 檔案"
   },
   "about": {
     "description": "簡單、直覺的個人花費記帳工具"

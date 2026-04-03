@@ -24,7 +24,9 @@
     "about": "About"
   },
   "settings": {
-    "language": "Language"
+    "language": "Language",
+    "exportCsv": "Export CSV",
+    "exportCsvDesc": "Download all expenses as a CSV file"
   },
   "about": {
     "description": "A simple and intuitive personal expense tracker"

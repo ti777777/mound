@@ -50,6 +50,7 @@ func main() {
 		exps := api.Group("/expenses")
 		{
 			exps.GET("", handler.ListExpenses)
+			exps.GET("/export", handler.ExportExpensesCSV)
 			exps.POST("", handler.CreateExpense)
 			exps.PUT("/:id", handler.UpdateExpense)
 			exps.DELETE("/:id", handler.DeleteExpense)

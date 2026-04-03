@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
-export default function Navbar({ auth, onAddExpense, onLogout }: {
+export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV }: {
   auth: { name?: string; email?: string }
   onAddExpense: () => void
   onLogout: () => void
+  onExportCSV: () => void
 }) {
   const { t, i18n } = useTranslation()
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -106,7 +107,7 @@ export default function Navbar({ auth, onAddExpense, onLogout }: {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
             </div>
-            <div className="px-6 py-5">
+            <div className="px-6 py-5 flex flex-col gap-5">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-[#0f172a]">{t('settings.language')}</p>
@@ -117,6 +118,22 @@ export default function Navbar({ auth, onAddExpense, onLogout }: {
                   className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[#e2e8f0] text-[#475569] hover:text-[#0ea5e9] hover:border-[#bae6fd] transition-colors"
                 >
                   {i18n.language === 'zh-TW' ? 'EN' : '中'}
+                </button>
+              </div>
+              <div className="border-t border-[#e2e8f0]"/>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[#0f172a]">{t('settings.exportCsv')}</p>
+                  <p className="text-xs text-[#94a3b8] mt-0.5">{t('settings.exportCsvDesc')}</p>
+                </div>
+                <button
+                  onClick={() => { onExportCSV(); setSettingsOpen(false) }}
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border border-[#e2e8f0] text-[#475569] hover:text-[#0ea5e9] hover:border-[#bae6fd] transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                  </svg>
+                  CSV
                 </button>
               </div>
             </div>
