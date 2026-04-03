@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useModalHistory } from '../hooks/useModalHistory'
 
 export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV }: {
   auth: { name?: string; email?: string }
@@ -10,6 +11,7 @@ export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV }: {
   const { t, i18n } = useTranslation()
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  useModalHistory(settingsOpen, () => setSettingsOpen(false))
   const [aboutOpen, setAboutOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 

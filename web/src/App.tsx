@@ -12,6 +12,7 @@ import ExpenseModal from './components/ExpenseModal'
 import CategoryModal from './components/CategoryModal'
 import DeleteModal from './components/DeleteModal'
 import { useFilter } from './contexts/FilterContext'
+import { useModalHistory } from './hooks/useModalHistory'
 
 export default function App() {
   const navigate = useNavigate()
@@ -32,6 +33,7 @@ export default function App() {
 
   // Expense modals
   const [addExpOpen, setAddExpOpen] = useState(false)
+  useModalHistory(addExpOpen, () => setAddExpOpen(false))
   const [addExpForm, setAddExpForm] = useState<ExpenseForm>(emptyExpenseForm())
   const [editExpense, setEditExpense] = useState<Expense | null>(null)
   const [editExpForm, setEditExpForm] = useState<ExpenseForm>(emptyExpenseForm())
