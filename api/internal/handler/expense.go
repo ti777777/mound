@@ -228,10 +228,13 @@ func parseCSVExpenses(c *gin.Context, uid uint) ([]model.Expense, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	// Strip UTF-8 BOM
 	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF})
 
 	r := csv.NewReader(bytes.NewReader(data))
+	r.FieldsPerRecord = -1 // allow variable field counts
+	r.LazyQuotes = true
 
 	// Skip header row
 	if _, err := r.Read(); err != nil {
@@ -252,12 +255,19 @@ func parseCSVExpenses(c *gin.Context, uid uint) ([]model.Expense, error) {
 		if err == io.EOF {
 			break
 		}
-		if err != nil || len(row) < 4 {
+		if err != nil || len(row) < 5 {
 			continue
 		}
 
-		date, err := time.Parse("2006-01-02", strings.TrimSpace(row[0]))
-		if err != nil {
+		dateStr := strings.TrimSpace(row[0])
+		var date time.Time
+		for _, layout := range []string{"2006-01-02", "2006/01/02", "2006/1/2", "01/02/2006", "02/01/2006"} {
+			if d, e := time.Parse(layout, dateStr); e == nil {
+				date = d
+				break
+			}
+		}
+		if date.IsZero() {
 			continue
 		}
 		amount, err := strconv.ParseFloat(strings.TrimSpace(row[4]), 64)
