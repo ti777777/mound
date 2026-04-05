@@ -175,6 +175,12 @@ export default function App() {
       .sort((a, b) => b.total - a.total)
   }, [categoryFilteredExpenses, currency, rates])
 
+  // Location suggestions (unique non-empty locations from all expenses)
+  const locationSuggestions = useMemo(() =>
+    Array.from(new Set(expenses.map(e => e.location).filter(Boolean))),
+    [expenses]
+  )
+
   // Filtered list
   const visibleExpenses = categoryFilteredExpenses
     .filter(e => {
@@ -199,6 +205,7 @@ export default function App() {
           description: addExpForm.description,
           category_id: addExpForm.categoryId || undefined,
           date: addExpForm.date,
+          location: addExpForm.location,
           note: addExpForm.note,
         }),
       })
@@ -214,7 +221,7 @@ export default function App() {
   // ── Edit Expense ─────────────────────────────────────
   const handleEditExpOpen = (exp: Expense) => {
     setEditExpense(exp)
-    setEditExpForm({ amount: String(exp.amount), description: exp.description, categoryId: exp.categoryId, currency: exp.currency, date: toDateStr(exp.date), note: exp.note })
+    setEditExpForm({ amount: String(exp.amount), description: exp.description, categoryId: exp.categoryId, currency: exp.currency, date: toDateStr(exp.date), location: exp.location, note: exp.note })
     setFormError(null)
   }
   const handleEditExpSubmit = async () => {
@@ -229,6 +236,7 @@ export default function App() {
           description: editExpForm.description,
           category_id: editExpForm.categoryId || undefined,
           date: editExpForm.date,
+          location: editExpForm.location,
           note: editExpForm.note,
         }),
       })
@@ -376,12 +384,12 @@ export default function App() {
 
       {/* Modals */}
       <ExpenseModal open={addExpOpen} title={t('expense.addTitle')} isEdit={false}
-        form={addExpForm} categories={categories} keywords={keywords}
+        form={addExpForm} categories={categories} keywords={keywords} locationSuggestions={locationSuggestions}
         onFormChange={setAddExpForm} onSubmit={handleAddExpSubmit}
         onClose={() => setAddExpOpen(false)} submitting={submitting} apiError={formError}/>
 
       <ExpenseModal open={editExpense !== null} title={t('expense.editTitle')} isEdit={true}
-        form={editExpForm} categories={categories} keywords={keywords}
+        form={editExpForm} categories={categories} keywords={keywords} locationSuggestions={locationSuggestions}
         onFormChange={setEditExpForm} onSubmit={handleEditExpSubmit}
         onClose={() => setEditExpense(null)} submitting={submitting} apiError={formError}/>
 

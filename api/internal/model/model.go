@@ -39,6 +39,7 @@ type Expense struct {
 	Amount      float64        `gorm:"not null" json:"amount"`
 	Currency    string         `gorm:"size:10;default:USD" json:"currency"`
 	Description string         `gorm:"size:512" json:"description"`
+	Location    string         `gorm:"size:255" json:"location"`
 	Note        string         `gorm:"type:text" json:"note"`
 	Date        time.Time      `json:"date"`
 	CreatedAt   time.Time      `json:"created_at"`

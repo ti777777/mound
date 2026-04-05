@@ -1,17 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ExpenseForm, Category } from '../types'
 import { CURRENCIES, getCurrencySymbol } from '../utils'
 
-export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, onFormChange, onSubmit, onClose, submitting, apiError }: {
+export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, locationSuggestions, onFormChange, onSubmit, onClose, submitting, apiError }: {
   open: boolean; title: string; isEdit?: boolean; form: ExpenseForm
   categories: Category[]
   keywords?: string[]
+  locationSuggestions?: string[]
   onFormChange: (f: ExpenseForm) => void; onSubmit: () => void; onClose: () => void
   submitting?: boolean; apiError?: string | null
 }) {
   const { t } = useTranslation()
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [locationOpen, setLocationOpen] = useState(false)
+  const locationRef = useRef<HTMLDivElement>(null)
 
   const validate = () => {
     const e: Record<string, string> = {}
@@ -25,6 +28,22 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
 
   const handleSubmit = () => { if (validate()) onSubmit() }
   useEffect(() => { setErrors({}) }, [form])
+
+  // Close location dropdown on outside click
+  useEffect(() => {
+    if (!locationOpen) return
+    const handler = (e: MouseEvent) => {
+      if (locationRef.current && !locationRef.current.contains(e.target as Node)) {
+        setLocationOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [locationOpen])
+
+  const filteredLocations = (locationSuggestions ?? []).filter(loc =>
+    loc.toLowerCase().includes(form.location.toLowerCase())
+  )
 
   if (!open) return null
   return (
@@ -103,6 +122,44 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
               onChange={e => onFormChange({...form, date: e.target.value})}
               className={`w-full bg-[#f8fafc] border rounded-xl py-2.5 px-4 text-sm focus:bg-white transition-colors outline-none ${errors.date ? 'border-red-300 focus:border-red-400' : 'border-[#e2e8f0] focus:border-[#0ea5e9]'}`}/>
             {errors.date && <p className="text-xs text-red-400 mt-1">{errors.date}</p>}
+          </div>
+          {/* Location */}
+          <div ref={locationRef} className="relative">
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.locationLabel')}</label>
+            <div className="relative">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8]">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                </svg>
+              </span>
+              <input
+                type="text"
+                value={form.location}
+                onChange={e => { onFormChange({...form, location: e.target.value}); setLocationOpen(true) }}
+                onFocus={() => setLocationOpen(true)}
+                placeholder={t('expense.locationPlaceholder')}
+                className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 pl-9 pr-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
+              />
+            </div>
+            {locationOpen && filteredLocations.length > 0 && (
+              <ul className="absolute z-10 mt-1 w-full bg-white border border-[#e2e8f0] rounded-xl shadow-lg overflow-hidden max-h-44 overflow-y-auto">
+                {filteredLocations.map(loc => (
+                  <li key={loc}>
+                    <button
+                      type="button"
+                      onMouseDown={e => e.preventDefault()}
+                      onClick={() => { onFormChange({...form, location: loc}); setLocationOpen(false) }}
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#f0f9ff] transition-colors flex items-center gap-2 ${form.location === loc ? 'bg-[#f0f9ff] text-[#0ea5e9] font-semibold' : 'text-slate-700'}`}
+                    >
+                      <svg className="w-3.5 h-3.5 shrink-0 text-[#94a3b8]" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                      </svg>
+                      {loc}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           {/* Note */}
           <div>

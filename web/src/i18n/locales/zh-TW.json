@@ -77,6 +77,8 @@
     "descriptionPlaceholder": "例：午餐、計程車、購物…",
     "categoryLabel": "類別",
     "dateLabel": "日期",
+    "locationLabel": "地點",
+    "locationPlaceholder": "選填，例：家附近、台北車站…",
     "noteLabel": "備註",
     "notePlaceholder": "選填",
     "errorAmount": "請輸入有效的金額",

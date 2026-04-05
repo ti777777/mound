@@ -93,6 +93,7 @@ type expenseReq struct {
 	Amount      float64 `json:"amount"      binding:"required,gt=0"`
 	Currency    string  `json:"currency"`
 	Description string  `json:"description" binding:"required,min=1,max=512"`
+	Location    string  `json:"location"`
 	Note        string  `json:"note"`
 	Date        string  `json:"date"`
 }
@@ -138,6 +139,7 @@ func CreateExpense(c *gin.Context) {
 		Amount:      req.Amount,
 		Currency:    req.Currency,
 		Description: req.Description,
+		Location:    req.Location,
 		Note:        req.Note,
 		Date:        date,
 	}
@@ -168,6 +170,7 @@ func UpdateExpense(c *gin.Context) {
 		exp.Currency = req.Currency
 	}
 	exp.Description = req.Description
+	exp.Location = req.Location
 	exp.Note = req.Note
 	if req.Date != "" {
 		if d, err := time.Parse("2006-01-02", req.Date); err == nil {
@@ -195,7 +198,7 @@ func ExportExpensesCSV(c *gin.Context) {
 	c.Writer.Write([]byte{0xEF, 0xBB, 0xBF})
 
 	w := csv.NewWriter(c.Writer)
-	w.Write([]string{"Date", "Description", "Category", "Currency", "Amount", "Note"})
+	w.Write([]string{"Date", "Description", "Category", "Currency", "Amount", "Location", "Note"})
 	for _, e := range expenses {
 		catName := ""
 		if e.Category != nil {
@@ -207,6 +210,7 @@ func ExportExpensesCSV(c *gin.Context) {
 			catName,
 			e.Currency,
 			strconv.FormatFloat(e.Amount, 'f', -1, 64),
+			e.Location,
 			e.Note,
 		})
 	}
@@ -248,7 +252,7 @@ func parseCSVExpenses(c *gin.Context, uid uint) ([]model.Expense, error) {
 		if err == io.EOF {
 			break
 		}
-		if err != nil || len(row) < 5 {
+		if err != nil || len(row) < 4 {
 			continue
 		}
 
@@ -275,9 +279,15 @@ func parseCSVExpenses(c *gin.Context, uid uint) ([]model.Expense, error) {
 			}
 		}
 
+		location := ""
 		note := ""
-		if len(row) >= 6 {
+		// Support both old format (6 cols: Date,Desc,Cat,Currency,Amount,Note)
+		// and new format (7 cols: Date,Desc,Cat,Currency,Amount,Location,Note)
+		if len(row) == 6 {
 			note = strings.TrimSpace(row[5])
+		} else if len(row) >= 7 {
+			location = strings.TrimSpace(row[5])
+			note = strings.TrimSpace(row[6])
 		}
 
 		expenses = append(expenses, model.Expense{
@@ -286,6 +296,7 @@ func parseCSVExpenses(c *gin.Context, uid uint) ([]model.Expense, error) {
 			Amount:      amount,
 			Currency:    strings.TrimSpace(row[3]),
 			Description: strings.TrimSpace(row[1]),
+			Location:    location,
 			Note:        note,
 			Date:        date,
 		})

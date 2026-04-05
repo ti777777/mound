@@ -77,6 +77,8 @@
     "descriptionPlaceholder": "e.g. Lunch, Taxi, Shopping…",
     "categoryLabel": "Category",
     "dateLabel": "Date",
+    "locationLabel": "Location",
+    "locationPlaceholder": "Optional, e.g. Home, Train Station…",
     "noteLabel": "Note",
     "notePlaceholder": "Optional",
     "errorAmount": "Please enter a valid amount",
