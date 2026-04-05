@@ -67,6 +67,25 @@ export default function App() {
     URL.revokeObjectURL(url)
   }
 
+  // CSV Import
+  const handleImportCSV = async (file: File, mode: 'overwrite' | 'append') => {
+    if (mode === 'overwrite' && !window.confirm(t('settings.importOverwriteConfirm'))) return
+    const form = new FormData()
+    form.append('file', file)
+    const res = await fetch(`/api/expenses/import/${mode}`, { method: 'POST', credentials: 'include', body: form })
+    if (!res.ok) return
+    const data = await res.json() as { imported: number }
+    const [catsRes, expsRes] = await Promise.all([authFetch('/api/categories'), authFetch('/api/expenses?size=500')])
+    if (!catsRes.ok || !expsRes.ok) return
+    const catsData = await catsRes.json()
+    const expsData = await expsRes.json()
+    const parsedCats: Category[] = (catsData ?? []).map(apiCategoryToCategory)
+    const catsById = new Map(parsedCats.map(c => [c.id, c]))
+    setCategories(parsedCats)
+    setExpenses((expsData ?? []).map((e: unknown) => apiExpenseToExpense(e, catsById)))
+    window.alert(t('settings.importSuccess', { count: data.imported }))
+  }
+
   // Keywords
   const [keywords, setKeywords] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem('mound_keywords') ?? '[]') } catch { return [] }
@@ -289,7 +308,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-      <Navbar auth={auth} onAddExpense={handleAddExpOpen} onLogout={handleLogout} onExportCSV={handleExportCSV} currency={currency} onCurrencyChange={setCurrency}/>
+      <Navbar auth={auth} onAddExpense={handleAddExpOpen} onLogout={handleLogout} onExportCSV={handleExportCSV} onImportCSV={handleImportCSV} currency={currency} onCurrencyChange={setCurrency}/>
 
       {apiError && (
         <div className="bg-red-50 border-b border-red-200 px-4 py-2 text-sm text-red-600 text-center">

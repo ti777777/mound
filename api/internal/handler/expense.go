@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/csv"
+	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -208,6 +211,113 @@ func ExportExpensesCSV(c *gin.Context) {
 		})
 	}
 	w.Flush()
+}
+
+func parseCSVExpenses(c *gin.Context, uid uint) ([]model.Expense, error) {
+	file, _, err := c.Request.FormFile("file")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	// Strip UTF-8 BOM
+	data = bytes.TrimPrefix(data, []byte{0xEF, 0xBB, 0xBF})
+
+	r := csv.NewReader(bytes.NewReader(data))
+
+	// Skip header row
+	if _, err := r.Read(); err != nil {
+		return nil, err
+	}
+
+	// Load existing categories for name matching
+	var cats []model.Category
+	model.DB.Where("user_id = ?", uid).Find(&cats)
+	catByName := make(map[string]uint)
+	for _, cat := range cats {
+		catByName[strings.ToLower(cat.Name)] = cat.ID
+	}
+
+	var expenses []model.Expense
+	for {
+		row, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil || len(row) < 5 {
+			continue
+		}
+
+		date, err := time.Parse("2006-01-02", strings.TrimSpace(row[0]))
+		if err != nil {
+			continue
+		}
+		amount, err := strconv.ParseFloat(strings.TrimSpace(row[4]), 64)
+		if err != nil || amount <= 0 {
+			continue
+		}
+
+		var catID *uint
+		if catName := strings.TrimSpace(row[2]); catName != "" {
+			if id, ok := catByName[strings.ToLower(catName)]; ok {
+				id := id
+				catID = &id
+			} else {
+				newCat := model.Category{UserID: uid, Name: catName, Color: "#94a3b8", Active: true}
+				model.DB.Create(&newCat)
+				catByName[strings.ToLower(catName)] = newCat.ID
+				newID := newCat.ID
+				catID = &newID
+			}
+		}
+
+		note := ""
+		if len(row) >= 6 {
+			note = strings.TrimSpace(row[5])
+		}
+
+		expenses = append(expenses, model.Expense{
+			UserID:      uid,
+			CategoryID:  catID,
+			Amount:      amount,
+			Currency:    strings.TrimSpace(row[3]),
+			Description: strings.TrimSpace(row[1]),
+			Note:        note,
+			Date:        date,
+		})
+	}
+	return expenses, nil
+}
+
+func ImportExpensesOverwrite(c *gin.Context) {
+	uid := middleware.CurrentUserID(c)
+	expenses, err := parseCSVExpenses(c, uid)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	model.DB.Where("user_id = ?", uid).Delete(&model.Expense{})
+	if len(expenses) > 0 {
+		model.DB.Create(&expenses)
+	}
+	c.JSON(http.StatusOK, gin.H{"imported": len(expenses)})
+}
+
+func ImportExpensesAppend(c *gin.Context) {
+	uid := middleware.CurrentUserID(c)
+	expenses, err := parseCSVExpenses(c, uid)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if len(expenses) > 0 {
+		model.DB.Create(&expenses)
+	}
+	c.JSON(http.StatusOK, gin.H{"imported": len(expenses)})
 }
 
 func DeleteExpense(c *gin.Context) {

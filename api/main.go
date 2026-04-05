@@ -52,6 +52,8 @@ func main() {
 		{
 			exps.GET("", handler.ListExpenses)
 			exps.GET("/export", handler.ExportExpensesCSV)
+			exps.POST("/import/overwrite", handler.ImportExpensesOverwrite)
+			exps.POST("/import/append", handler.ImportExpensesAppend)
 			exps.POST("", handler.CreateExpense)
 			exps.PUT("/:id", handler.UpdateExpense)
 			exps.DELETE("/:id", handler.DeleteExpense)

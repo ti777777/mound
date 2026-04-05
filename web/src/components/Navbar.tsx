@@ -4,11 +4,12 @@ import { useModalHistory } from '../hooks/useModalHistory'
 import { CURRENCIES } from '../utils'
 import { authFetch } from '../api'
 
-export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV, currency, onCurrencyChange }: {
+export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV, onImportCSV, currency, onCurrencyChange }: {
   auth: { name?: string; email?: string }
   onAddExpense: () => void
   onLogout: () => void
   onExportCSV: () => void
+  onImportCSV: (file: File, mode: 'overwrite' | 'append') => void
   currency: string
   onCurrencyChange: (c: string) => void
 }) {
@@ -18,6 +19,15 @@ export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV, curr
   useModalHistory(settingsOpen, () => setSettingsOpen(false))
   const [aboutOpen, setAboutOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const overwriteInputRef = useRef<HTMLInputElement>(null)
+  const appendInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileSelect = (mode: 'overwrite' | 'append') => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+    onImportCSV(file, mode)
+  }
 
   const toggleLang = () => {
     const next = i18n.language === 'zh-TW' ? 'en' : 'zh-TW'
@@ -163,10 +173,39 @@ export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV, curr
                   CSV
                 </button>
               </div>
+              <div className="border-t border-[#e2e8f0]"/>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-[#0f172a]">{t('settings.importCsv')}</p>
+                  <p className="text-xs text-[#94a3b8] mt-0.5">{t('settings.importCsvDesc')}</p>
+                </div>
+                <div className="flex gap-1.5 shrink-0">
+                  <button
+                    onClick={() => { setSettingsOpen(false); overwriteInputRef.current?.click() }}
+                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border border-[#e2e8f0] text-[#475569] hover:text-[#ef4444] hover:border-[#fca5a5] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 7.5m0 0l-4.5 4.5M12 7.5V21"/>
+                    </svg>
+                    {t('settings.importOverwrite')}
+                  </button>
+                  <button
+                    onClick={() => { setSettingsOpen(false); appendInputRef.current?.click() }}
+                    className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border border-[#e2e8f0] text-[#475569] hover:text-[#0ea5e9] hover:border-[#bae6fd] transition-colors"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 7.5m0 0l-4.5 4.5M12 7.5V21"/>
+                    </svg>
+                    {t('settings.importAppend')}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       )}
+      <input ref={overwriteInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileSelect('overwrite')} />
+      <input ref={appendInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileSelect('append')} />
 
       {/* About Modal */}
       {aboutOpen && (

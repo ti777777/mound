@@ -28,7 +28,13 @@
     "currency": "Default Currency",
     "currencyDesc": "Default currency for new expenses",
     "exportCsv": "Export CSV",
-    "exportCsvDesc": "Download all expenses as a CSV file"
+    "exportCsvDesc": "Download all expenses as a CSV file",
+    "importCsv": "Import CSV",
+    "importCsvDesc": "Import expenses from a CSV file",
+    "importOverwrite": "Overwrite",
+    "importAppend": "Append",
+    "importOverwriteConfirm": "This will delete all existing expenses. Continue?",
+    "importSuccess": "Successfully imported {{count}} expenses"
   },
   "about": {
     "description": "A simple and intuitive personal expense tracker"
