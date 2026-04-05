@@ -3,17 +3,20 @@ import { useTranslation } from 'react-i18next'
 import type { ExpenseForm, Category } from '../types'
 import { CURRENCIES, getCurrencySymbol } from '../utils'
 
-export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, locationSuggestions, onFormChange, onSubmit, onClose, submitting, apiError }: {
+export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, descriptionSuggestions, locationSuggestions, onFormChange, onSubmit, onClose, submitting, apiError }: {
   open: boolean; title: string; isEdit?: boolean; form: ExpenseForm
   categories: Category[]
   keywords?: string[]
+  descriptionSuggestions?: string[]
   locationSuggestions?: string[]
   onFormChange: (f: ExpenseForm) => void; onSubmit: () => void; onClose: () => void
   submitting?: boolean; apiError?: string | null
 }) {
   const { t } = useTranslation()
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [descOpen, setDescOpen] = useState(false)
   const [locationOpen, setLocationOpen] = useState(false)
+  const descRef = useRef<HTMLDivElement>(null)
   const locationRef = useRef<HTMLDivElement>(null)
 
   const validate = () => {
@@ -29,18 +32,20 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
   const handleSubmit = () => { if (validate()) onSubmit() }
   useEffect(() => { setErrors({}) }, [form])
 
-  // Close location dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
-    if (!locationOpen) return
+    if (!descOpen && !locationOpen) return
     const handler = (e: MouseEvent) => {
-      if (locationRef.current && !locationRef.current.contains(e.target as Node)) {
-        setLocationOpen(false)
-      }
+      if (descRef.current && !descRef.current.contains(e.target as Node)) setDescOpen(false)
+      if (locationRef.current && !locationRef.current.contains(e.target as Node)) setLocationOpen(false)
     }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
-  }, [locationOpen])
+  }, [descOpen, locationOpen])
 
+  const filteredDescriptions = (descriptionSuggestions ?? []).filter(d =>
+    d.toLowerCase().includes(form.description.toLowerCase())
+  )
   const filteredLocations = (locationSuggestions ?? []).filter(loc =>
     loc.toLowerCase().includes(form.location.toLowerCase())
   )
@@ -85,13 +90,30 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
             {errors.amount && <p className="text-xs text-red-400 mt-1">{errors.amount}</p>}
           </div>
           {/* Description */}
-          <div>
+          <div ref={descRef} className="relative">
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.descriptionLabel')} <span className="text-red-400">*</span></label>
             <input type="text" value={form.description}
-              onChange={e => onFormChange({...form, description: e.target.value})}
+              onChange={e => { onFormChange({...form, description: e.target.value}); setDescOpen(true) }}
+              onFocus={() => setDescOpen(true)}
               placeholder={t('expense.descriptionPlaceholder')}
               className={`w-full bg-[#f8fafc] border rounded-xl py-2.5 px-4 text-sm focus:bg-white transition-colors outline-none ${errors.description ? 'border-red-300 focus:border-red-400' : 'border-[#e2e8f0] focus:border-[#0ea5e9]'}`}/>
             {errors.description && <p className="text-xs text-red-400 mt-1">{errors.description}</p>}
+            {descOpen && filteredDescriptions.length > 0 && (
+              <ul className="absolute z-10 mt-1 w-full bg-white border border-[#e2e8f0] rounded-xl shadow-lg overflow-hidden max-h-44 overflow-y-auto">
+                {filteredDescriptions.map(d => (
+                  <li key={d}>
+                    <button
+                      type="button"
+                      onMouseDown={e => e.preventDefault()}
+                      onClick={() => { onFormChange({...form, description: d}); setDescOpen(false) }}
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#f0f9ff] transition-colors ${form.description === d ? 'bg-[#f0f9ff] text-[#0ea5e9] font-semibold' : 'text-slate-700'}`}
+                    >
+                      {d}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
             {keywords && keywords.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {keywords.map(kw => (

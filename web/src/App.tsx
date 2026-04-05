@@ -175,6 +175,12 @@ export default function App() {
       .sort((a, b) => b.total - a.total)
   }, [categoryFilteredExpenses, currency, rates])
 
+  // Description suggestions (unique non-empty descriptions from all expenses)
+  const descriptionSuggestions = useMemo(() =>
+    Array.from(new Set(expenses.map(e => e.description).filter(Boolean))),
+    [expenses]
+  )
+
   // Location suggestions (unique non-empty locations from all expenses)
   const locationSuggestions = useMemo(() =>
     Array.from(new Set(expenses.map(e => e.location).filter(Boolean))),
@@ -384,12 +390,12 @@ export default function App() {
 
       {/* Modals */}
       <ExpenseModal open={addExpOpen} title={t('expense.addTitle')} isEdit={false}
-        form={addExpForm} categories={categories} keywords={keywords} locationSuggestions={locationSuggestions}
+        form={addExpForm} categories={categories} keywords={keywords} descriptionSuggestions={descriptionSuggestions} locationSuggestions={locationSuggestions}
         onFormChange={setAddExpForm} onSubmit={handleAddExpSubmit}
         onClose={() => setAddExpOpen(false)} submitting={submitting} apiError={formError}/>
 
       <ExpenseModal open={editExpense !== null} title={t('expense.editTitle')} isEdit={true}
-        form={editExpForm} categories={categories} keywords={keywords} locationSuggestions={locationSuggestions}
+        form={editExpForm} categories={categories} keywords={keywords} descriptionSuggestions={descriptionSuggestions} locationSuggestions={locationSuggestions}
         onFormChange={setEditExpForm} onSubmit={handleEditExpSubmit}
         onClose={() => setEditExpense(null)} submitting={submitting} apiError={formError}/>
 
