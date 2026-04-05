@@ -99,5 +99,23 @@ func Me(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"id": user.ID, "name": user.Name, "email": user.Email})
+	c.JSON(http.StatusOK, gin.H{"id": user.ID, "name": user.Name, "email": user.Email, "currency": user.Currency})
+}
+
+type updateSettingsReq struct {
+	Currency string `json:"currency" binding:"required,min=1,max=10"`
+}
+
+func UpdateSettings(c *gin.Context) {
+	var req updateSettingsReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	uid := middleware.CurrentUserID(c)
+	if err := model.DB.Model(&model.User{}).Where("id = ?", uid).Update("currency", req.Currency).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "update failed"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"currency": req.Currency})
 }

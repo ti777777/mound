@@ -88,6 +88,7 @@ func DeleteCategory(c *gin.Context) {
 type expenseReq struct {
 	CategoryID  *uint   `json:"category_id"`
 	Amount      float64 `json:"amount"      binding:"required,gt=0"`
+	Currency    string  `json:"currency"`
 	Description string  `json:"description" binding:"required,min=1,max=512"`
 	Note        string  `json:"note"`
 	Date        string  `json:"date"`
@@ -132,6 +133,7 @@ func CreateExpense(c *gin.Context) {
 		UserID:      uid,
 		CategoryID:  req.CategoryID,
 		Amount:      req.Amount,
+		Currency:    req.Currency,
 		Description: req.Description,
 		Note:        req.Note,
 		Date:        date,
@@ -159,6 +161,9 @@ func UpdateExpense(c *gin.Context) {
 	}
 	exp.CategoryID = req.CategoryID
 	exp.Amount = req.Amount
+	if req.Currency != "" {
+		exp.Currency = req.Currency
+	}
 	exp.Description = req.Description
 	exp.Note = req.Note
 	if req.Date != "" {
@@ -187,7 +192,7 @@ func ExportExpensesCSV(c *gin.Context) {
 	c.Writer.Write([]byte{0xEF, 0xBB, 0xBF})
 
 	w := csv.NewWriter(c.Writer)
-	w.Write([]string{"Date", "Description", "Category", "Amount", "Note"})
+	w.Write([]string{"Date", "Description", "Category", "Currency", "Amount", "Note"})
 	for _, e := range expenses {
 		catName := ""
 		if e.Category != nil {
@@ -197,6 +202,7 @@ func ExportExpensesCSV(c *gin.Context) {
 			e.Date.Format("2006-01-02"),
 			e.Description,
 			catName,
+			e.Currency,
 			strconv.FormatFloat(e.Amount, 'f', -1, 64),
 			e.Note,
 		})

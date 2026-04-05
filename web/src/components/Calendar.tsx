@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { Expense } from '../types'
-import { toDateStr } from '../utils'
+import { toDateStr, getCurrencySymbol, convertAmount } from '../utils'
 import { useFilter } from '../contexts/FilterContext'
+import { useCurrency } from '../contexts/CurrencyContext'
 
 export default function Calendar({ expenses }: { expenses: Expense[] }) {
   const { t } = useTranslation()
@@ -10,6 +11,8 @@ export default function Calendar({ expenses }: { expenses: Expense[] }) {
   const weekdays = t('calendar.weekdays', { returnObjects: true }) as string[]
 
   const { dateRange, setDateRange, clearDateRange } = useFilter()
+  const { currency, rates } = useCurrency()
+  const symbol = getCurrencySymbol(currency)
   const [{ year, month }, setCal] = useState(() => {
     const n = new Date()
     return { year: n.getFullYear(), month: n.getMonth() }
@@ -33,7 +36,7 @@ export default function Calendar({ expenses }: { expenses: Expense[] }) {
     const end = dateRange.end ?? dateRange.start
     return expenses
       .filter(e => { const d = toDateStr(e.date); return d >= dateRange.start! && d <= end })
-      .reduce((s, e) => s + e.amount, 0)
+      .reduce((s, e) => s + convertAmount(e.amount, e.currency, currency, rates), 0)
   })()
 
   const days = Array(firstDay).fill(null).concat(Array.from({ length: daysInMonth }, (_, i) => i + 1))
@@ -124,7 +127,7 @@ export default function Calendar({ expenses }: { expenses: Expense[] }) {
             <span className="text-xs text-slate-600 font-semibold">
               {fmtD(dateRange.start)}
               {dateRange.end && dateRange.end !== dateRange.start && <> – {fmtD(dateRange.end)}</>}
-              {rangeTotal !== null && <> · NT${rangeTotal.toLocaleString()}</>}
+              {rangeTotal !== null && <> · {symbol}{rangeTotal.toLocaleString()}</>}
             </span>
             {dateRange.end ? (
               <button onClick={clearDateRange} className="text-xs text-[#94a3b8] hover:text-[#0ea5e9] transition-colors flex items-center gap-1">

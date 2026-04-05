@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ExpenseForm, Category } from '../types'
+import { CURRENCIES, getCurrencySymbol } from '../utils'
 
 export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, onFormChange, onSubmit, onClose, submitting, apiError }: {
   open: boolean; title: string; isEdit?: boolean; form: ExpenseForm
@@ -39,15 +40,28 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
           {apiError && (
             <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2 text-sm text-red-600">{apiError}</div>
           )}
-          {/* Amount */}
+          {/* Amount + Currency */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.amountLabel')} <span className="text-red-400">*</span></label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#94a3b8] font-semibold select-none">NT$</span>
-              <input type="number" min="0" step="1" value={form.amount}
-                onChange={e => onFormChange({...form, amount: e.target.value})}
-                placeholder="0"
-                className={`w-full bg-[#f8fafc] border rounded-xl py-2.5 pl-12 pr-4 text-sm focus:bg-white transition-colors outline-none ${errors.amount ? 'border-red-300 focus:border-red-400' : 'border-[#e2e8f0] focus:border-[#0ea5e9]'}`}/>
+            <div className="flex gap-2">
+              <select
+                value={form.currency}
+                onChange={e => onFormChange({...form, currency: e.target.value})}
+                className="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-3 text-sm font-semibold text-[#475569] focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none shrink-0"
+              >
+                {CURRENCIES.map(c => (
+                  <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>
+                ))}
+              </select>
+              <div className="relative flex-1">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#94a3b8] font-semibold select-none">
+                  {getCurrencySymbol(form.currency)}
+                </span>
+                <input type="number" min="0" step="1" value={form.amount}
+                  onChange={e => onFormChange({...form, amount: e.target.value})}
+                  placeholder="0"
+                  className={`w-full bg-[#f8fafc] border rounded-xl py-2.5 pl-12 pr-4 text-sm focus:bg-white transition-colors outline-none ${errors.amount ? 'border-red-300 focus:border-red-400' : 'border-[#e2e8f0] focus:border-[#0ea5e9]'}`}/>
+              </div>
             </div>
             {errors.amount && <p className="text-xs text-red-400 mt-1">{errors.amount}</p>}
           </div>

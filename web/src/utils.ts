@@ -20,8 +20,36 @@ export function formatDate(ts: number): string {
   return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`
 }
 
-export function formatAmount(amount: number): string {
-  return `NT$\u00a0${amount.toLocaleString('zh-TW', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+export const CURRENCIES = [
+  { code: 'TWD', symbol: 'NT$' },
+  { code: 'USD', symbol: '$' },
+  { code: 'EUR', symbol: '€' },
+  { code: 'JPY', symbol: '¥' },
+  { code: 'GBP', symbol: '£' },
+  { code: 'CNY', symbol: 'CN¥' },
+  { code: 'KRW', symbol: '₩' },
+  { code: 'HKD', symbol: 'HK$' },
+  { code: 'SGD', symbol: 'S$' },
+  { code: 'AUD', symbol: 'A$' },
+  { code: 'CAD', symbol: 'C$' },
+  { code: 'THB', symbol: '฿' },
+]
+
+export function getCurrencySymbol(currency: string): string {
+  return CURRENCIES.find(c => c.code === currency)?.symbol ?? 'NT$'
+}
+
+export function convertAmount(amount: number, from: string, to: string, rates: Record<string, number> | null): number {
+  if (!rates || !from || from === to) return amount
+  const fromRate = rates[from]
+  const toRate = rates[to]
+  if (!fromRate || !toRate) return amount
+  return (amount / fromRate) * toRate
+}
+
+export function formatAmount(amount: number, currency = 'TWD'): string {
+  const symbol = getCurrencySymbol(currency)
+  return `${symbol}\u00a0${amount.toLocaleString('en', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,16 +72,18 @@ export function apiExpenseToExpense(e: any, catsById: Map<number, Category>): Ex
     categoryName: cat?.name ?? t('common.uncategorized'),
     categoryColor: cat?.color ?? '#94a3b8',
     amount: e.amount,
+    currency: e.currency || 'TWD',
     description: e.description ?? '',
     note: e.note ?? '',
     date: new Date(e.date).getTime(),
   }
 }
 
-export const emptyExpenseForm = (): ExpenseForm => ({
+export const emptyExpenseForm = (defaultCurrency = 'TWD'): ExpenseForm => ({
   amount: '',
   description: '',
   categoryId: null,
+  currency: defaultCurrency,
   date: new Date().toISOString().slice(0, 10),
   note: '',
 })

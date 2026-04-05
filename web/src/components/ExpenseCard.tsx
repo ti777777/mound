@@ -13,7 +13,7 @@ export default function ExpenseCard({ expense, onEdit, onDelete }: {
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="text-xl font-black text-[#0f172a]">{formatAmount(expense.amount)}</span>
+            <span className="text-xl font-black text-[#0f172a]">{formatAmount(expense.amount, expense.currency)}</span>
             {expense.categoryId && (
               <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full"
                 style={{ background: expense.categoryColor + '22', color: expense.categoryColor }}>

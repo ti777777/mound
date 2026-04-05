@@ -7,6 +7,7 @@ import App from './App.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
 import { FilterProvider } from './contexts/FilterContext.tsx'
+import { CurrencyProvider } from './contexts/CurrencyContext.tsx'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<'loading' | 'ok' | 'no'>('loading')
@@ -32,6 +33,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <CurrencyProvider>
     <FilterProvider>
       <BrowserRouter>
         <Routes>
@@ -41,5 +43,6 @@ createRoot(document.getElementById('root')!).render(
         </Routes>
       </BrowserRouter>
     </FilterProvider>
+    </CurrencyProvider>
   </StrictMode>,
 )

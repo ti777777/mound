@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { authFetch } from './api'
 import type { Category, Expense, ExpenseForm, CategoryForm, ChartDatum } from './types'
-import { apiCategoryToCategory, apiExpenseToExpense, emptyExpenseForm, emptyCategoryForm, toDateStr, formatAmount } from './utils'
+import { apiCategoryToCategory, apiExpenseToExpense, emptyExpenseForm, emptyCategoryForm, toDateStr, formatAmount, convertAmount } from './utils'
+import { useCurrency } from './contexts/CurrencyContext'
 import Navbar from './components/Navbar'
 import LeftSidebar from './components/LeftSidebar'
 import ExpenseList from './components/ExpenseList'
@@ -17,6 +18,7 @@ import { useModalHistory } from './hooks/useModalHistory'
 export default function App() {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const { currency, setCurrency, rates } = useCurrency()
   const [auth, setAuthInfo] = useState<{ email?: string; name?: string }>({})
   const { dateRange, filterCategories, keyword } = useFilter()
 
@@ -94,8 +96,9 @@ export default function App() {
         ])
         if (catsRes.status === 401 || expsRes.status === 401) { navigate('/login'); return }
         if (meRes.ok) {
-          const me = await meRes.json() as { email: string; name: string }
+          const me = await meRes.json() as { email: string; name: string; currency?: string }
           setAuthInfo({ email: me.email, name: me.name })
+          if (me.currency) setCurrency(me.currency)
         }
         if (!catsRes.ok || !expsRes.ok) throw new Error(t('app.loadFailed'))
         const catsData = await catsRes.json()
@@ -134,20 +137,24 @@ export default function App() {
     [rangeExpenses, filterCategories]
   )
 
-  const rangeTotal = categoryFilteredExpenses.reduce((s, e) => s + e.amount, 0)
+  const rangeTotal = useMemo(
+    () => categoryFilteredExpenses.reduce((s, e) => s + convertAmount(e.amount, e.currency, currency, rates), 0),
+    [categoryFilteredExpenses, currency, rates]
+  )
 
   const categoryTotals = useMemo<ChartDatum[]>(() => {
     const map = new Map<string, { color: string; total: number }>()
     categoryFilteredExpenses.forEach(e => {
+      const converted = convertAmount(e.amount, e.currency, currency, rates)
       const key = e.categoryName
       const cur = map.get(key)
-      if (cur) cur.total += e.amount
-      else map.set(key, { color: e.categoryColor, total: e.amount })
+      if (cur) cur.total += converted
+      else map.set(key, { color: e.categoryColor, total: converted })
     })
     return Array.from(map.entries())
       .map(([name, { color, total }]) => ({ name, color, total }))
       .sort((a, b) => b.total - a.total)
-  }, [categoryFilteredExpenses])
+  }, [categoryFilteredExpenses, currency, rates])
 
   // Filtered list
   const visibleExpenses = categoryFilteredExpenses
@@ -161,7 +168,7 @@ export default function App() {
     .sort((a, b) => sort === 'amount' ? b.amount - a.amount : b.date - a.date)
 
   // ── Add Expense ──────────────────────────────────────
-  const handleAddExpOpen = () => { setAddExpForm(emptyExpenseForm()); setFormError(null); setAddExpOpen(true) }
+  const handleAddExpOpen = () => { setAddExpForm(emptyExpenseForm(currency)); setFormError(null); setAddExpOpen(true) }
   const handleAddExpSubmit = async () => {
     setSubmitting(true); setFormError(null)
     try {
@@ -169,6 +176,7 @@ export default function App() {
         method: 'POST',
         body: JSON.stringify({
           amount: parseFloat(addExpForm.amount),
+          currency: addExpForm.currency,
           description: addExpForm.description,
           category_id: addExpForm.categoryId || undefined,
           date: addExpForm.date,
@@ -187,7 +195,7 @@ export default function App() {
   // ── Edit Expense ─────────────────────────────────────
   const handleEditExpOpen = (exp: Expense) => {
     setEditExpense(exp)
-    setEditExpForm({ amount: String(exp.amount), description: exp.description, categoryId: exp.categoryId, date: toDateStr(exp.date), note: exp.note })
+    setEditExpForm({ amount: String(exp.amount), description: exp.description, categoryId: exp.categoryId, currency: exp.currency, date: toDateStr(exp.date), note: exp.note })
     setFormError(null)
   }
   const handleEditExpSubmit = async () => {
@@ -198,6 +206,7 @@ export default function App() {
         method: 'PUT',
         body: JSON.stringify({
           amount: parseFloat(editExpForm.amount),
+          currency: editExpForm.currency,
           description: editExpForm.description,
           category_id: editExpForm.categoryId || undefined,
           date: editExpForm.date,
@@ -280,7 +289,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
-      <Navbar auth={auth} onAddExpense={handleAddExpOpen} onLogout={handleLogout} onExportCSV={handleExportCSV}/>
+      <Navbar auth={auth} onAddExpense={handleAddExpOpen} onLogout={handleLogout} onExportCSV={handleExportCSV} currency={currency} onCurrencyChange={setCurrency}/>
 
       {apiError && (
         <div className="bg-red-50 border-b border-red-200 px-4 py-2 text-sm text-red-600 text-center">
@@ -368,7 +377,7 @@ export default function App() {
         submitting={submitting} apiError={formError}/>
 
       <DeleteModal
-        message={deleteExpense ? t('deleteModal.expenseMessage', { description: deleteExpense.description, amount: formatAmount(deleteExpense.amount) }) : null}
+        message={deleteExpense ? t('deleteModal.expenseMessage', { description: deleteExpense.description, amount: formatAmount(deleteExpense.amount, deleteExpense.currency) }) : null}
         onConfirm={handleDeleteExpConfirm} onClose={() => setDeleteExpense(null)} submitting={submitting}/>
 
       <DeleteModal

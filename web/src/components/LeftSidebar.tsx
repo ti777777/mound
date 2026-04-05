@@ -2,6 +2,8 @@ import { useTranslation } from 'react-i18next'
 import type { Category, ChartDatum } from '../types'
 import { DonutChart, BarChart } from './Charts'
 import { useFilter } from '../contexts/FilterContext'
+import { useCurrency } from '../contexts/CurrencyContext'
+import { getCurrencySymbol } from '../utils'
 
 export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, categoriesCount, activeCategories, categoryTotals }: {
   open: boolean
@@ -13,6 +15,8 @@ export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, cat
   categoryTotals: ChartDatum[]
 }) {
   const { t } = useTranslation()
+  const { currency } = useCurrency()
+  const symbol = getCurrencySymbol(currency)
   const { filterCategories, toggleFilterCategory, clearFilterCategories, selectAllFilterCategories } = useFilter()
   const allSelected = activeCategories.length > 0 && activeCategories.every(c => filterCategories.includes(c.name))
   return (
@@ -26,7 +30,7 @@ export default function LeftSidebar({ open, onClose, rangeTotal, rangeCount, cat
           <p className="text-xs font-bold text-[#94a3b8] uppercase tracking-widest">{t('leftSidebar.overview')}</p>
           <div className="flex justify-between items-center text-sm">
             <span className="text-slate-600">{t('leftSidebar.totalExpenses')}</span>
-            <span className="font-bold text-[#0ea5e9]">NT${rangeTotal.toLocaleString()}</span>
+            <span className="font-bold text-[#0ea5e9]">{symbol}{rangeTotal.toLocaleString()}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
             <span className="text-slate-600">{t('leftSidebar.count')}</span>

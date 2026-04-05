@@ -12,6 +12,7 @@ export interface Expense {
   categoryName: string
   categoryColor: string
   amount: number
+  currency: string
   description: string
   note: string
   date: number
@@ -21,6 +22,7 @@ export interface ExpenseForm {
   amount: string
   description: string
   categoryId: number | null
+  currency: string
   date: string
   note: string
 }

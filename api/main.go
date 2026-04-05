@@ -34,6 +34,7 @@ func main() {
 		auth.POST("/login", handler.Login)
 		auth.POST("/logout", middleware.Auth(), handler.Logout)
 		auth.GET("/me", middleware.Auth(), handler.Me)
+		auth.PUT("/settings", middleware.Auth(), handler.UpdateSettings)
 	}
 
 	// ── Protected routes ─────────────────────────────────

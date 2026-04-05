@@ -1,12 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useModalHistory } from '../hooks/useModalHistory'
+import { CURRENCIES } from '../utils'
+import { authFetch } from '../api'
 
-export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV }: {
+export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV, currency, onCurrencyChange }: {
   auth: { name?: string; email?: string }
   onAddExpense: () => void
   onLogout: () => void
   onExportCSV: () => void
+  currency: string
+  onCurrencyChange: (c: string) => void
 }) {
   const { t, i18n } = useTranslation()
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -19,6 +23,11 @@ export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV }: {
     const next = i18n.language === 'zh-TW' ? 'en' : 'zh-TW'
     i18n.changeLanguage(next)
     localStorage.setItem('mound_lang', next)
+  }
+
+  const handleCurrencyChange = async (code: string) => {
+    onCurrencyChange(code)
+    await authFetch('/api/auth/settings', { method: 'PUT', body: JSON.stringify({ currency: code }) })
   }
 
   useEffect(() => {
@@ -121,6 +130,22 @@ export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV }: {
                 >
                   {i18n.language === 'zh-TW' ? 'EN' : '中'}
                 </button>
+              </div>
+              <div className="border-t border-[#e2e8f0]"/>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-[#0f172a]">{t('settings.currency')}</p>
+                  <p className="text-xs text-[#94a3b8] mt-0.5">{t('settings.currencyDesc')}</p>
+                </div>
+                <select
+                  value={currency}
+                  onChange={e => handleCurrencyChange(e.target.value)}
+                  className="text-xs font-bold px-2 py-1.5 rounded-lg border border-[#e2e8f0] text-[#475569] bg-white hover:border-[#bae6fd] focus:outline-none focus:border-[#0ea5e9] transition-colors"
+                >
+                  {CURRENCIES.map(c => (
+                    <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>
+                  ))}
+                </select>
               </div>
               <div className="border-t border-[#e2e8f0]"/>
               <div className="flex items-center justify-between">

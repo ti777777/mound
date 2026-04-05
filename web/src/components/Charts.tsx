@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { ChartDatum } from '../types'
+import { useCurrency } from '../contexts/CurrencyContext'
+import { getCurrencySymbol } from '../utils'
 
 export function DonutChart({ data }: { data: ChartDatum[] }) {
   const { t } = useTranslation()
@@ -43,6 +45,8 @@ export function DonutChart({ data }: { data: ChartDatum[] }) {
 }
 
 export function BarChart({ data }: { data: ChartDatum[] }) {
+  const { currency } = useCurrency()
+  const symbol = getCurrencySymbol(currency)
   const max = Math.max(...data.map(d => d.total), 1)
   return (
     <div className="space-y-2.5">
@@ -51,7 +55,7 @@ export function BarChart({ data }: { data: ChartDatum[] }) {
           <div className="flex items-center justify-between mb-1 gap-1">
             <span className="text-xs text-slate-600 truncate flex-1">{d.name}</span>
             <span className="text-xs font-semibold text-slate-700 shrink-0">
-              NT${d.total.toLocaleString()}
+              {symbol}{d.total.toLocaleString()}
             </span>
           </div>
           <div className="h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
