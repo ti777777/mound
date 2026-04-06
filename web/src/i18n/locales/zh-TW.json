@@ -10,7 +10,18 @@
     "deleting": "刪除中…",
     "saveChanges": "儲存變更",
     "uncategorized": "未分類",
-    "reload": "重新載入"
+    "reload": "重新載入",
+    "confirm": "確認",
+    "search": "搜尋"
+  },
+  "location": {
+    "pickTitle": "在地圖上選取地點",
+    "searchPlaceholder": "搜尋地址或地名…",
+    "clickMapHint": "或直接點擊地圖上的位置來放置標記",
+    "openMap": "在地圖上選取",
+    "clearCoords": "移除座標",
+    "loading": "取得地址中…",
+    "noSelection": "尚未選取地點"
   },
   "app": {
     "loadFailed": "載入失敗，請重新整理",

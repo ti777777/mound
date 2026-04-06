@@ -27,10 +27,27 @@ export default function ExpenseCard({ expense, onEdit, onDelete }: {
             <p className="text-xs text-[#94a3b8]">{formatDate(expense.date)}</p>
             {expense.location && (
               <p className="text-xs text-[#64748b] flex items-center gap-1">
-                <svg className="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-                </svg>
-                {expense.location}
+                {(expense.latitude != null && expense.longitude != null) ? (
+                  <a
+                    href={`https://www.openstreetmap.org/?mlat=${expense.latitude}&mlon=${expense.longitude}&zoom=16`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 hover:text-[#0ea5e9] transition-colors"
+                    title={`${expense.latitude.toFixed(5)}, ${expense.longitude.toFixed(5)}`}
+                  >
+                    <svg className="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                    </svg>
+                    {expense.location}
+                  </a>
+                ) : (
+                  <>
+                    <svg className="w-3 h-3 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                    </svg>
+                    {expense.location}
+                  </>
+                )}
               </p>
             )}
           </div>

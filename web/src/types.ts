@@ -15,6 +15,8 @@ export interface Expense {
   currency: string
   description: string
   location: string
+  latitude: number | null
+  longitude: number | null
   note: string
   date: number
 }
@@ -26,6 +28,8 @@ export interface ExpenseForm {
   currency: string
   date: string
   location: string
+  latitude: number | null
+  longitude: number | null
   note: string
 }
 

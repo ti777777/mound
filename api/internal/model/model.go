@@ -40,6 +40,8 @@ type Expense struct {
 	Currency    string         `gorm:"size:10;default:USD" json:"currency"`
 	Description string         `gorm:"size:512" json:"description"`
 	Location    string         `gorm:"size:255" json:"location"`
+	Latitude    *float64       `gorm:"type:real" json:"latitude,omitempty"`
+	Longitude   *float64       `gorm:"type:real" json:"longitude,omitempty"`
 	Note        string         `gorm:"type:text" json:"note"`
 	Date        time.Time      `json:"date"`
 	CreatedAt   time.Time      `json:"created_at"`

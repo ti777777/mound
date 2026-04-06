@@ -212,6 +212,8 @@ export default function App() {
           category_id: addExpForm.categoryId || undefined,
           date: addExpForm.date,
           location: addExpForm.location,
+          latitude: addExpForm.latitude,
+          longitude: addExpForm.longitude,
           note: addExpForm.note,
         }),
       })
@@ -227,7 +229,7 @@ export default function App() {
   // ── Edit Expense ─────────────────────────────────────
   const handleEditExpOpen = (exp: Expense) => {
     setEditExpense(exp)
-    setEditExpForm({ amount: String(exp.amount), description: exp.description, categoryId: exp.categoryId, currency: exp.currency, date: toDateStr(exp.date), location: exp.location, note: exp.note })
+    setEditExpForm({ amount: String(exp.amount), description: exp.description, categoryId: exp.categoryId, currency: exp.currency, date: toDateStr(exp.date), location: exp.location, latitude: exp.latitude, longitude: exp.longitude, note: exp.note })
     setFormError(null)
   }
   const handleEditExpSubmit = async () => {
@@ -243,6 +245,8 @@ export default function App() {
           category_id: editExpForm.categoryId || undefined,
           date: editExpForm.date,
           location: editExpForm.location,
+          latitude: editExpForm.latitude,
+          longitude: editExpForm.longitude,
           note: editExpForm.note,
         }),
       })

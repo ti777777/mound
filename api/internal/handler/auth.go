@@ -3,10 +3,11 @@ package handler
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"mound/api/internal/middleware"
 	"mound/api/internal/model"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type registerReq struct {

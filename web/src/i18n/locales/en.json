@@ -10,7 +10,18 @@
     "deleting": "Deleting…",
     "saveChanges": "Save Changes",
     "uncategorized": "Uncategorized",
-    "reload": "Reload"
+    "reload": "Reload",
+    "confirm": "Confirm",
+    "search": "Search"
+  },
+  "location": {
+    "pickTitle": "Pick Location on Map",
+    "searchPlaceholder": "Search address or place…",
+    "clickMapHint": "Or click anywhere on the map to drop a pin",
+    "openMap": "Pick on map",
+    "clearCoords": "Remove coordinates",
+    "loading": "Getting address…",
+    "noSelection": "No location selected"
   },
   "app": {
     "loadFailed": "Load failed, please refresh",

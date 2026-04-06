@@ -75,6 +75,8 @@ export function apiExpenseToExpense(e: any, catsById: Map<number, Category>): Ex
     currency: e.currency || 'TWD',
     description: e.description ?? '',
     location: e.location ?? '',
+    latitude: e.latitude ?? null,
+    longitude: e.longitude ?? null,
     note: e.note ?? '',
     date: new Date(e.date).getTime(),
   }
@@ -87,6 +89,8 @@ export const emptyExpenseForm = (defaultCurrency = 'TWD'): ExpenseForm => ({
   currency: defaultCurrency,
   date: new Date().toISOString().slice(0, 10),
   location: '',
+  latitude: null,
+  longitude: null,
   note: '',
 })
 

@@ -89,13 +89,15 @@ func DeleteCategory(c *gin.Context) {
 // ── Expenses ───────────────────────────────────────────
 
 type expenseReq struct {
-	CategoryID  *uint   `json:"category_id"`
-	Amount      float64 `json:"amount"      binding:"required,gt=0"`
-	Currency    string  `json:"currency"`
-	Description string  `json:"description" binding:"required,min=1,max=512"`
-	Location    string  `json:"location"`
-	Note        string  `json:"note"`
-	Date        string  `json:"date"`
+	CategoryID  *uint    `json:"category_id"`
+	Amount      float64  `json:"amount"      binding:"required,gt=0"`
+	Currency    string   `json:"currency"`
+	Description string   `json:"description" binding:"required,min=1,max=512"`
+	Location    string   `json:"location"`
+	Latitude    *float64 `json:"latitude"`
+	Longitude   *float64 `json:"longitude"`
+	Note        string   `json:"note"`
+	Date        string   `json:"date"`
 }
 
 func ListExpenses(c *gin.Context) {
@@ -140,6 +142,8 @@ func CreateExpense(c *gin.Context) {
 		Currency:    req.Currency,
 		Description: req.Description,
 		Location:    req.Location,
+		Latitude:    req.Latitude,
+		Longitude:   req.Longitude,
 		Note:        req.Note,
 		Date:        date,
 	}
@@ -171,6 +175,8 @@ func UpdateExpense(c *gin.Context) {
 	}
 	exp.Description = req.Description
 	exp.Location = req.Location
+	exp.Latitude = req.Latitude
+	exp.Longitude = req.Longitude
 	exp.Note = req.Note
 	if req.Date != "" {
 		if d, err := time.Parse("2006-01-02", req.Date); err == nil {
@@ -198,11 +204,19 @@ func ExportExpensesCSV(c *gin.Context) {
 	c.Writer.Write([]byte{0xEF, 0xBB, 0xBF})
 
 	w := csv.NewWriter(c.Writer)
-	w.Write([]string{"Date", "Description", "Category", "Currency", "Amount", "Location", "Note"})
+	w.Write([]string{"Date", "Description", "Category", "Currency", "Amount", "Location", "Latitude", "Longitude", "Note"})
 	for _, e := range expenses {
 		catName := ""
 		if e.Category != nil {
 			catName = e.Category.Name
+		}
+		latStr := ""
+		lngStr := ""
+		if e.Latitude != nil {
+			latStr = strconv.FormatFloat(*e.Latitude, 'f', 6, 64)
+		}
+		if e.Longitude != nil {
+			lngStr = strconv.FormatFloat(*e.Longitude, 'f', 6, 64)
 		}
 		w.Write([]string{
 			e.Date.Format("2006-01-02"),
@@ -211,6 +225,8 @@ func ExportExpensesCSV(c *gin.Context) {
 			e.Currency,
 			strconv.FormatFloat(e.Amount, 'f', -1, 64),
 			e.Location,
+			latStr,
+			lngStr,
 			e.Note,
 		})
 	}
@@ -291,13 +307,25 @@ func parseCSVExpenses(c *gin.Context, uid uint) ([]model.Expense, error) {
 
 		location := ""
 		note := ""
-		// Support both old format (6 cols: Date,Desc,Cat,Currency,Amount,Note)
-		// and new format (7 cols: Date,Desc,Cat,Currency,Amount,Location,Note)
+		var lat, lng *float64
+		// Format support:
+		// 6 cols: Date,Desc,Cat,Currency,Amount,Note (old)
+		// 7 cols: Date,Desc,Cat,Currency,Amount,Location,Note (v2)
+		// 9 cols: Date,Desc,Cat,Currency,Amount,Location,Latitude,Longitude,Note (v3)
 		if len(row) == 6 {
 			note = strings.TrimSpace(row[5])
-		} else if len(row) >= 7 {
+		} else if len(row) == 7 || len(row) == 8 {
 			location = strings.TrimSpace(row[5])
-			note = strings.TrimSpace(row[6])
+			note = strings.TrimSpace(row[len(row)-1])
+		} else if len(row) >= 9 {
+			location = strings.TrimSpace(row[5])
+			if v, err := strconv.ParseFloat(strings.TrimSpace(row[6]), 64); err == nil {
+				lat = &v
+			}
+			if v, err := strconv.ParseFloat(strings.TrimSpace(row[7]), 64); err == nil {
+				lng = &v
+			}
+			note = strings.TrimSpace(row[8])
 		}
 
 		expenses = append(expenses, model.Expense{
@@ -307,6 +335,8 @@ func parseCSVExpenses(c *gin.Context, uid uint) ([]model.Expense, error) {
 			Currency:    strings.TrimSpace(row[3]),
 			Description: strings.TrimSpace(row[1]),
 			Location:    location,
+			Latitude:    lat,
+			Longitude:   lng,
 			Note:        note,
 			Date:        date,
 		})

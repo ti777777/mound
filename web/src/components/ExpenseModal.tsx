@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ExpenseForm, Category } from '../types'
 import { CURRENCIES, getCurrencySymbol } from '../utils'
+import LocationPicker from './LocationPicker'
 
 export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, descriptionSuggestions, locationSuggestions, onFormChange, onSubmit, onClose, submitting, apiError }: {
   open: boolean; title: string; isEdit?: boolean; form: ExpenseForm
@@ -16,6 +17,7 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [descOpen, setDescOpen] = useState(false)
   const [locationOpen, setLocationOpen] = useState(false)
+  const [mapPickerOpen, setMapPickerOpen] = useState(false)
   const descRef = useRef<HTMLDivElement>(null)
   const locationRef = useRef<HTMLDivElement>(null)
 
@@ -149,7 +151,7 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
           <div ref={locationRef} className="relative">
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.locationLabel')}</label>
             <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8]">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8] pointer-events-none">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
                 </svg>
@@ -160,9 +162,41 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
                 onChange={e => { onFormChange({...form, location: e.target.value}); setLocationOpen(true) }}
                 onFocus={() => setLocationOpen(true)}
                 placeholder={t('expense.locationPlaceholder')}
-                className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 pl-9 pr-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
+                className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 pl-9 pr-10 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none"
               />
+              {/* Map picker button */}
+              <button
+                type="button"
+                onClick={() => { setLocationOpen(false); setMapPickerOpen(true) }}
+                title={t('location.openMap')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 rounded-lg text-[#94a3b8] hover:text-[#0ea5e9] hover:bg-[#e0f2fe] transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13V7m0 13 6-3M9 7l6-3m0 17 5.447-2.724A1 1 0 0 0 21 16.382V5.618a1 1 0 0 0-1.447-.894L15 7m0 0v14"/>
+                </svg>
+              </button>
             </div>
+            {/* Coordinates badge */}
+            {(form.latitude != null && form.longitude != null) && (
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <span className="inline-flex items-center gap-1 text-xs bg-[#f0f9ff] text-[#0ea5e9] border border-[#bae6fd] rounded-lg px-2 py-0.5">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                  </svg>
+                  {form.latitude.toFixed(5)}, {form.longitude.toFixed(5)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onFormChange({...form, latitude: null, longitude: null})}
+                  className="text-xs text-[#94a3b8] hover:text-red-400 transition-colors"
+                  title={t('location.clearCoords')}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            )}
             {locationOpen && filteredLocations.length > 0 && (
               <ul className="absolute z-10 mt-1 w-full bg-white border border-[#e2e8f0] rounded-xl shadow-lg overflow-hidden max-h-44 overflow-y-auto">
                 {filteredLocations.map(loc => (
@@ -183,6 +217,18 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
               </ul>
             )}
           </div>
+          {/* Map Picker Modal */}
+          {mapPickerOpen && (
+            <LocationPicker
+              initialLat={form.latitude}
+              initialLng={form.longitude}
+              onClose={() => setMapPickerOpen(false)}
+              onSelect={loc => {
+                onFormChange({...form, location: form.location || loc.name, latitude: loc.lat, longitude: loc.lng})
+                setMapPickerOpen(false)
+              }}
+            />
+          )}
           {/* Note */}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">{t('expense.noteLabel')}</label>
