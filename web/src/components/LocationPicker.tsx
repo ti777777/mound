@@ -194,7 +194,7 @@ export default function LocationPicker({ onSelect, onClose, initialLat, initialL
               </button>
             </div>
             {searchResults.length > 0 && (
-              <ul className="absolute z-10 mt-1 w-full bg-white border border-[#e2e8f0] rounded-xl shadow-lg overflow-hidden max-h-44 overflow-y-auto">
+              <ul className="absolute z-[2000] mt-1 w-full bg-white border border-[#e2e8f0] rounded-xl shadow-lg overflow-hidden max-h-44 overflow-y-auto">
                 {searchResults.map(r => (
                   <li key={r.place_id}>
                     <button
