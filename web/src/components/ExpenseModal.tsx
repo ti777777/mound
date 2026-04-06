@@ -12,7 +12,7 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
   categories: Category[]
   keywords?: string[]
   descriptionSuggestions?: string[]
-  locationSuggestions?: string[]
+  locationSuggestions?: { name: string; latitude: number | null; longitude: number | null }[]
   onFormChange: (f: ExpenseForm) => void; onSubmit: () => void; onClose: () => void
   submitting?: boolean; apiError?: string | null
   // Images
@@ -59,7 +59,7 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
     d.toLowerCase().includes(form.description.toLowerCase())
   )
   const filteredLocations = (locationSuggestions ?? []).filter(loc =>
-    loc.toLowerCase().includes(form.location.toLowerCase())
+    loc.name.toLowerCase().includes(form.location.toLowerCase())
   )
 
   if (!open) return null
@@ -210,17 +210,25 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
             {locationOpen && filteredLocations.length > 0 && (
               <ul className="absolute z-10 mt-1 w-full bg-white border border-[#e2e8f0] rounded-xl shadow-lg overflow-hidden max-h-44 overflow-y-auto">
                 {filteredLocations.map(loc => (
-                  <li key={loc}>
+                  <li key={loc.name}>
                     <button
                       type="button"
                       onMouseDown={e => e.preventDefault()}
-                      onClick={() => { onFormChange({...form, location: loc}); setLocationOpen(false) }}
-                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#f0f9ff] transition-colors flex items-center gap-2 ${form.location === loc ? 'bg-[#f0f9ff] text-[#0ea5e9] font-semibold' : 'text-slate-700'}`}
+                      onClick={() => {
+                        onFormChange({...form, location: loc.name, latitude: loc.latitude, longitude: loc.longitude})
+                        setLocationOpen(false)
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm hover:bg-[#f0f9ff] transition-colors flex items-center gap-2 ${form.location === loc.name ? 'bg-[#f0f9ff] text-[#0ea5e9] font-semibold' : 'text-slate-700'}`}
                     >
                       <svg className="w-3.5 h-3.5 shrink-0 text-[#94a3b8]" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
                       </svg>
-                      {loc}
+                      {loc.name}
+                      {loc.latitude != null && loc.longitude != null && (
+                        <svg className="w-3 h-3 shrink-0 text-[#0ea5e9] ml-auto" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+                        </svg>
+                      )}
                     </button>
                   </li>
                 ))}

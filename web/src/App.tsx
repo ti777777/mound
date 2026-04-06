@@ -185,11 +185,16 @@ export default function App() {
     [expenses]
   )
 
-  // Location suggestions (unique non-empty locations from all expenses)
-  const locationSuggestions = useMemo(() =>
-    Array.from(new Set(expenses.map(e => e.location).filter(Boolean))),
-    [expenses]
-  )
+  // Location suggestions (unique non-empty locations from all expenses, with coords from most recent match)
+  const locationSuggestions = useMemo(() => {
+    const seen = new Map<string, { name: string; latitude: number | null; longitude: number | null }>()
+    for (const e of expenses) {
+      if (e.location && !seen.has(e.location)) {
+        seen.set(e.location, { name: e.location, latitude: e.latitude ?? null, longitude: e.longitude ?? null })
+      }
+    }
+    return Array.from(seen.values())
+  }, [expenses])
 
   // Filtered list
   const visibleExpenses = categoryFilteredExpenses
