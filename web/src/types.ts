@@ -6,6 +6,15 @@ export interface Category {
   createdAt: number
 }
 
+export interface ExpenseImage {
+  id: number
+  expenseId: number
+  filename: string
+  mimeType: string
+  size: number
+  createdAt: number
+}
+
 export interface Expense {
   id: number
   categoryId: number | null
@@ -19,6 +28,7 @@ export interface Expense {
   longitude: number | null
   note: string
   date: number
+  images: ExpenseImage[]
 }
 
 export interface ExpenseForm {

@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { useTranslation } from 'react-i18next'
 import { authFetch } from './api'
-import type { Category, Expense, ExpenseForm, CategoryForm, ChartDatum } from './types'
-import { apiCategoryToCategory, apiExpenseToExpense, emptyExpenseForm, emptyCategoryForm, toDateStr, formatAmount, convertAmount } from './utils'
+import type { Category, Expense, ExpenseForm, CategoryForm, ChartDatum, ExpenseImage } from './types'
+import { apiCategoryToCategory, apiExpenseToExpense, apiImageToExpenseImage, emptyExpenseForm, emptyCategoryForm, toDateStr, formatAmount, convertAmount, compressImage } from './utils'
 import { useCurrency } from './contexts/CurrencyContext'
 import Navbar from './components/Navbar'
 import LeftSidebar from './components/LeftSidebar'
@@ -40,6 +40,10 @@ export default function App() {
   const [editExpense, setEditExpense] = useState<Expense | null>(null)
   const [editExpForm, setEditExpForm] = useState<ExpenseForm>(emptyExpenseForm())
   const [deleteExpense, setDeleteExpense] = useState<Expense | null>(null)
+
+  // Image state
+  const [addExpImages, setAddExpImages] = useState<File[]>([])
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   // Category modals
   const [addCatOpen, setAddCatOpen] = useState(false)
@@ -198,8 +202,36 @@ export default function App() {
     })
     .sort((a, b) => sort === 'amount' ? b.amount - a.amount : b.date - a.date)
 
+  // ── Image helpers ─────────────────────────────────────
+  const uploadImageForExpense = async (expId: number, file: File): Promise<ExpenseImage | null> => {
+    setUploadingImage(true)
+    try {
+      const compressed = await compressImage(file)
+      const fd = new FormData()
+      fd.append('file', compressed)
+      const res = await authFetch(`/api/expenses/${expId}/images`, { method: 'POST', body: fd })
+      if (!res.ok) return null
+      return apiImageToExpenseImage(await res.json())
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const handleUploadImageEdit = async (file: File) => {
+    if (!editExpense) return
+    const img = await uploadImageForExpense(editExpense.id, file)
+    if (img) setExpenses(prev => prev.map(e => e.id === editExpense.id ? { ...e, images: [...e.images, img] } : e))
+  }
+
+  const handleDeleteImageEdit = async (imgId: number) => {
+    if (!editExpense) return
+    await authFetch(`/api/expenses/${editExpense.id}/images/${imgId}`, { method: 'DELETE' })
+    setExpenses(prev => prev.map(e => e.id === editExpense.id ? { ...e, images: e.images.filter(i => i.id !== imgId) } : e))
+    setEditExpense(prev => prev ? { ...prev, images: prev.images.filter(i => i.id !== imgId) } : null)
+  }
+
   // ── Add Expense ──────────────────────────────────────
-  const handleAddExpOpen = () => { setAddExpForm(emptyExpenseForm(currency)); setFormError(null); setAddExpOpen(true) }
+  const handleAddExpOpen = () => { setAddExpForm(emptyExpenseForm(currency)); setAddExpImages([]); setFormError(null); setAddExpOpen(true) }
   const handleAddExpSubmit = async () => {
     setSubmitting(true); setFormError(null)
     try {
@@ -220,7 +252,15 @@ export default function App() {
       if (!res.ok) { const err = await res.json().catch(() => ({})); throw new Error((err as {error?: string}).error ?? t('expense.addFailed')) }
       const catsById = new Map(categories.map(c => [c.id, c]))
       const newExp = apiExpenseToExpense(await res.json(), catsById)
+
+      // Upload staged images
+      for (const file of addExpImages) {
+        const img = await uploadImageForExpense(newExp.id, file)
+        if (img) newExp.images.push(img)
+      }
+
       setExpenses(prev => [newExp, ...prev])
+      setAddExpImages([])
       setAddExpOpen(false)
     } catch (e) { setFormError((e as Error).message) }
     finally { setSubmitting(false) }
@@ -396,12 +436,18 @@ export default function App() {
       <ExpenseModal open={addExpOpen} title={t('expense.addTitle')} isEdit={false}
         form={addExpForm} categories={categories} keywords={keywords} descriptionSuggestions={descriptionSuggestions} locationSuggestions={locationSuggestions}
         onFormChange={setAddExpForm} onSubmit={handleAddExpSubmit}
-        onClose={() => setAddExpOpen(false)} submitting={submitting} apiError={formError}/>
+        onClose={() => setAddExpOpen(false)} submitting={submitting} apiError={formError}
+        stagedImages={addExpImages} onStagedImagesChange={setAddExpImages}
+        uploadingImage={uploadingImage}/>
 
       <ExpenseModal open={editExpense !== null} title={t('expense.editTitle')} isEdit={true}
         form={editExpForm} categories={categories} keywords={keywords} descriptionSuggestions={descriptionSuggestions} locationSuggestions={locationSuggestions}
         onFormChange={setEditExpForm} onSubmit={handleEditExpSubmit}
-        onClose={() => setEditExpense(null)} submitting={submitting} apiError={formError}/>
+        onClose={() => setEditExpense(null)} submitting={submitting} apiError={formError}
+        existingImages={editExpense?.images ?? []}
+        onUploadImage={handleUploadImageEdit}
+        onDeleteImage={handleDeleteImageEdit}
+        uploadingImage={uploadingImage}/>
 
       <CategoryModal open={addCatOpen} title={t('category.addTitle')} isEdit={false}
         form={addCatForm} onFormChange={setAddCatForm}

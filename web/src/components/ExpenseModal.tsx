@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import type { ExpenseForm, Category } from '../types'
+import type { ExpenseForm, Category, ExpenseImage } from '../types'
 import { CURRENCIES, getCurrencySymbol } from '../utils'
 import LocationPicker from './LocationPicker'
+import ExpenseImagePanel from './ExpenseImagePanel'
 
-export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, descriptionSuggestions, locationSuggestions, onFormChange, onSubmit, onClose, submitting, apiError }: {
+export default function ExpenseModal({ open, title, isEdit, form, categories, keywords, descriptionSuggestions, locationSuggestions, onFormChange, onSubmit, onClose, submitting, apiError,
+  existingImages, stagedImages, onStagedImagesChange, onUploadImage, onDeleteImage, uploadingImage,
+}: {
   open: boolean; title: string; isEdit?: boolean; form: ExpenseForm
   categories: Category[]
   keywords?: string[]
@@ -12,6 +15,13 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
   locationSuggestions?: string[]
   onFormChange: (f: ExpenseForm) => void; onSubmit: () => void; onClose: () => void
   submitting?: boolean; apiError?: string | null
+  // Images
+  existingImages?: ExpenseImage[]
+  stagedImages?: File[]
+  onStagedImagesChange?: (files: File[]) => void
+  onUploadImage?: (file: File) => Promise<void>
+  onDeleteImage?: (id: number) => Promise<void>
+  uploadingImage?: boolean
 }) {
   const { t } = useTranslation()
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -237,6 +247,16 @@ export default function ExpenseModal({ open, title, isEdit, form, categories, ke
               rows={2}
               className="w-full bg-[#f8fafc] border border-[#e2e8f0] rounded-xl py-2.5 px-4 text-sm focus:border-[#0ea5e9] focus:bg-white transition-colors outline-none resize-none"/>
           </div>
+          {/* Images */}
+          <ExpenseImagePanel
+            isEditMode={!!isEdit}
+            existingImages={existingImages ?? []}
+            stagedFiles={stagedImages ?? []}
+            onStagedFilesChange={onStagedImagesChange ?? (() => {})}
+            onUploadImmediate={onUploadImage}
+            onDeleteExisting={onDeleteImage ?? (() => Promise.resolve())}
+            uploading={uploadingImage}
+          />
         </div>
         <div className="px-6 py-4 border-t border-[#e2e8f0] flex justify-end gap-3">
           <button onClick={onClose} disabled={submitting}

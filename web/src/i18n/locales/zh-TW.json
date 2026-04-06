@@ -96,7 +96,11 @@
     "errorDescription": "請輸入描述",
     "errorDate": "請選擇日期",
     "addFailed": "新增失敗",
-    "saveFailed": "儲存失敗"
+    "saveFailed": "儲存失敗",
+    "imagesLabel": "照片",
+    "imagesAdd": "新增照片",
+    "imagesPending": "待上傳",
+    "imagesStagedHint": "儲存後將自動上傳照片"
   },
   "category": {
     "addTitle": "新增類別",

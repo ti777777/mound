@@ -48,5 +48,16 @@ type Expense struct {
 	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
 
-	Category *Category `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Category *Category      `gorm:"foreignKey:CategoryID" json:"category,omitempty"`
+	Images   []ExpenseImage `gorm:"foreignKey:ExpenseID" json:"images,omitempty"`
+}
+
+type ExpenseImage struct {
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	ExpenseID uint      `gorm:"not null;index" json:"expense_id"`
+	UserID    uint      `gorm:"not null;index" json:"user_id"`
+	Filename  string    `gorm:"size:255;not null" json:"filename"`
+	MimeType  string    `gorm:"size:64" json:"mime_type"`
+	Size      int64     `json:"size"`
+	CreatedAt time.Time `json:"created_at"`
 }

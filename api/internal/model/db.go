@@ -28,7 +28,7 @@ func InitDB(dsn string) {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	if err = DB.AutoMigrate(&User{}, &Category{}, &Expense{}); err != nil {
+	if err = DB.AutoMigrate(&User{}, &Category{}, &Expense{}, &ExpenseImage{}); err != nil {
 		log.Fatalf("failed to migrate: %v", err)
 	}
 

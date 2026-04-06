@@ -5,6 +5,8 @@ import (
 	"encoding/csv"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -116,6 +118,7 @@ func ListExpenses(c *gin.Context) {
 	model.DB.
 		Where("user_id = ?", uid).
 		Preload("Category").
+		Preload("Images").
 		Order("date DESC").
 		Limit(size).Offset(offset).
 		Find(&expenses)
@@ -151,7 +154,7 @@ func CreateExpense(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	model.DB.Preload("Category").First(&exp, exp.ID)
+	model.DB.Preload("Category").Preload("Images").First(&exp, exp.ID)
 	c.JSON(http.StatusCreated, exp)
 }
 
@@ -184,7 +187,7 @@ func UpdateExpense(c *gin.Context) {
 		}
 	}
 	model.DB.Save(&exp)
-	model.DB.Preload("Category").First(&exp, exp.ID)
+	model.DB.Preload("Category").Preload("Images").First(&exp, exp.ID)
 	c.JSON(http.StatusOK, exp)
 }
 
@@ -374,6 +377,15 @@ func ImportExpensesAppend(c *gin.Context) {
 func DeleteExpense(c *gin.Context) {
 	uid := middleware.CurrentUserID(c)
 	id := c.Param("id")
+
+	// Cascade delete images from disk
+	var images []model.ExpenseImage
+	model.DB.Where("expense_id = ? AND user_id = ?", id, uid).Find(&images)
+	for _, img := range images {
+		os.Remove(filepath.Join(UploadDir, img.Filename))
+	}
+	model.DB.Where("expense_id = ? AND user_id = ?", id, uid).Delete(&model.ExpenseImage{})
+
 	if err := model.DB.Where("id = ? AND user_id = ?", id, uid).Delete(&model.Expense{}).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "expense not found"})
 		return

@@ -96,7 +96,11 @@
     "errorDescription": "Please enter a description",
     "errorDate": "Please select a date",
     "addFailed": "Failed to add",
-    "saveFailed": "Failed to save"
+    "saveFailed": "Failed to save",
+    "imagesLabel": "Photos",
+    "imagesAdd": "Add Photo",
+    "imagesPending": "pending",
+    "imagesStagedHint": "Photos will be uploaded after saving"
   },
   "category": {
     "addTitle": "Add Category",

@@ -1,5 +1,5 @@
 import { t } from 'i18next'
-import type { Category, Expense, ExpenseForm, CategoryForm } from './types'
+import type { Category, Expense, ExpenseForm, CategoryForm, ExpenseImage } from './types'
 
 export const MONTHS = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月']
 export const PRESET_COLORS = [
@@ -64,6 +64,22 @@ export function apiCategoryToCategory(c: any): Category {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function apiImageToExpenseImage(i: any): ExpenseImage {
+  return {
+    id: i.id,
+    expenseId: i.expense_id,
+    filename: i.filename,
+    mimeType: i.mime_type,
+    size: i.size,
+    createdAt: new Date(i.created_at).getTime(),
+  }
+}
+
+export function imageUrl(filename: string): string {
+  return `/uploads/${filename}`
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function apiExpenseToExpense(e: any, catsById: Map<number, Category>): Expense {
   const cat = catsById.get(e.category_id) ?? e.category
   return {
@@ -79,7 +95,33 @@ export function apiExpenseToExpense(e: any, catsById: Map<number, Category>): Ex
     longitude: e.longitude ?? null,
     note: e.note ?? '',
     date: new Date(e.date).getTime(),
+    images: (e.images ?? []).map(apiImageToExpenseImage),
   }
+}
+
+/** Compress an image file using Canvas (client-side, reduces upload size) */
+export function compressImage(file: File, maxPx = 1920, quality = 0.85): Promise<File> {
+  return new Promise(resolve => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      let { width, height } = img
+      if (Math.max(width, height) > maxPx) {
+        if (width >= height) { height = Math.round(height * maxPx / width); width = maxPx }
+        else { width = Math.round(width * maxPx / height); height = maxPx }
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width; canvas.height = height
+      canvas.getContext('2d')!.drawImage(img, 0, 0, width, height)
+      URL.revokeObjectURL(url)
+      canvas.toBlob(blob => {
+        if (blob) resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }))
+        else resolve(file)
+      }, 'image/jpeg', quality)
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file) }
+    img.src = url
+  })
 }
 
 export const emptyExpenseForm = (defaultCurrency = 'TWD'): ExpenseForm => ({

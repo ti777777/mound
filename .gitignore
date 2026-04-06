@@ -1,2 +1,4 @@
 .claude
 bin
+uploads
+api/web/dist/dist

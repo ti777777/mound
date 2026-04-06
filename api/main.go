@@ -22,6 +22,12 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+	uploadDir := os.Getenv("UPLOAD_DIR")
+	if uploadDir == "" {
+		uploadDir = "./uploads"
+	}
+	handler.UploadDir = uploadDir
+	os.MkdirAll(uploadDir, 0755)
 
 	model.InitDB(dsn)
 
@@ -57,8 +63,13 @@ func main() {
 			exps.POST("", handler.CreateExpense)
 			exps.PUT("/:id", handler.UpdateExpense)
 			exps.DELETE("/:id", handler.DeleteExpense)
+			exps.POST("/:id/images", handler.UploadExpenseImage)
+			exps.DELETE("/:id/images/:imgId", handler.DeleteExpenseImage)
 		}
 	}
+
+	// ── User-uploaded files ───────────────────────────────
+	r.Static("/uploads", uploadDir)
 
 	// ── Frontend static files ─────────────────────────────
 	distFS, err := fs.Sub(staticFiles, "web/dist")
