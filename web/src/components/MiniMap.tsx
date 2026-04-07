@@ -119,13 +119,6 @@ export default function MiniMap({ expenses }: { expenses: Expense[] }) {
           </div>
         )}
       </div>
-
-      {/* Footer stats */}
-      <div className="px-3 py-2 border-t border-[#f1f5f9]">
-        <p className="text-xs text-[#94a3b8]">
-          {t('map.geoCount', { count: geoCount, total: expenses.length })}
-        </p>
-      </div>
     </div>
   )
 }
