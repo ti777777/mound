@@ -62,7 +62,7 @@ export default function Navbar({ auth, onAddExpense, onLogout, onExportCSV, onIm
           <span className="font-black text-lg tracking-tight">Mound</span>
         </a>
         <div className="flex-1"/>
-        <button onClick={onAddExpense}
+<button onClick={onAddExpense}
           className="flex items-center gap-2 text-sm font-bold bg-[#0ea5e9] text-white px-1.5 sm:px-4 py-1.5 rounded-xl hover:bg-[#0284c7] transition-colors">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
           <span className='hidden sm:inline'>{t('nav.addExpense')}</span>

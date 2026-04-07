@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { Expense, Category } from '../types'
 import Calendar from './Calendar'
+import MiniMap from './MiniMap'
 
 export default function RightSidebar({ open, onClose, expenses, loading, categories, onAddCategory, onEditCategory, onDeleteCategory, keywords, newKeyword, onNewKeywordChange, onAddKeyword, onDeleteKeyword }: {
   open: boolean
@@ -100,6 +101,7 @@ export default function RightSidebar({ open, onClose, expenses, loading, categor
             )}
           </div>
         </div>
+        <MiniMap expenses={expenses} />
       </aside>
     </>
   )

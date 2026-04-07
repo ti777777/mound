@@ -157,6 +157,14 @@
     "total": "Total",
     "noData": "No data"
   },
+  "map": {
+    "title": "Expense Map",
+    "backToList": "Back to list",
+    "geoCount": "{{count}} / {{total}} with location",
+    "viewFull": "View full map",
+    "noGeoExpenses": "No location data",
+    "noGeoHint": "Pick a location when adding expenses to see them on the map"
+  },
   "calendar": {
     "months": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     "weekdays": ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],

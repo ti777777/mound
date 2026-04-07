@@ -6,6 +6,7 @@ import './index.css'
 import App from './App.tsx'
 import LoginPage from './pages/LoginPage.tsx'
 import RegisterPage from './pages/RegisterPage.tsx'
+import ExpenseMapPage from './pages/ExpenseMapPage.tsx'
 import { FilterProvider } from './contexts/FilterContext.tsx'
 import { CurrencyProvider } from './contexts/CurrencyContext.tsx'
 
@@ -39,6 +40,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+          <Route path="/map" element={<ProtectedRoute><ExpenseMapPage /></ProtectedRoute>} />
           <Route path="/*" element={<ProtectedRoute><App /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
