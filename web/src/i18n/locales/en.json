@@ -37,7 +37,7 @@
   "settings": {
     "language": "Language",
     "currency": "Default Currency",
-    "currencyDesc": "Default currency for new expenses",
+    "currencyDesc": "Base currency",
     "exportCsv": "Export CSV",
     "exportCsvDesc": "Download all expenses as a CSV file",
     "importCsv": "Import CSV",

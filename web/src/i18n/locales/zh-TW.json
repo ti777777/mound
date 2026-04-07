@@ -37,7 +37,7 @@
   "settings": {
     "language": "語言",
     "currency": "預設貨幣",
-    "currencyDesc": "新增花費時的預設貨幣單位",
+    "currencyDesc": "基準貨幣",
     "exportCsv": "匯出 CSV",
     "exportCsvDesc": "將所有花費記錄下載為 CSV 檔案",
     "importCsv": "匯入 CSV",
