@@ -205,7 +205,7 @@ export default function App() {
       }
       return true
     })
-    .sort((a, b) => sort === 'amount' ? b.amount - a.amount : b.date - a.date)
+    .sort((a, b) => sort === 'amount' ? b.amount - a.amount : b.createdAt - a.createdAt)
 
   // ── Image helpers ─────────────────────────────────────
   const uploadImageForExpense = async (expId: number, file: File): Promise<ExpenseImage | null> => {

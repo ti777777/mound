@@ -28,6 +28,7 @@ export interface Expense {
   longitude: number | null
   note: string
   date: number
+  createdAt: number
   images: ExpenseImage[]
 }
 

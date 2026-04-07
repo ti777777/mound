@@ -95,6 +95,7 @@ export function apiExpenseToExpense(e: any, catsById: Map<number, Category>): Ex
     longitude: e.longitude ?? null,
     note: e.note ?? '',
     date: new Date(e.date).getTime(),
+    createdAt: e.created_at ? new Date(e.created_at).getTime() : new Date(e.date).getTime(),
     images: (e.images ?? []).map(apiImageToExpenseImage),
   }
 }
