@@ -38,6 +38,7 @@ export default function App() {
   useModalHistory(addExpOpen, () => setAddExpOpen(false))
   const [addExpForm, setAddExpForm] = useState<ExpenseForm>(emptyExpenseForm())
   const [editExpense, setEditExpense] = useState<Expense | null>(null)
+  useModalHistory(editExpense !== null, () => setEditExpense(null))
   const [editExpForm, setEditExpForm] = useState<ExpenseForm>(emptyExpenseForm())
   const [deleteExpense, setDeleteExpense] = useState<Expense | null>(null)
 
