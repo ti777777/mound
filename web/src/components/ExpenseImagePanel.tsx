@@ -4,13 +4,10 @@ import type { ExpenseImage } from '../types'
 import { imageUrl } from '../utils'
 
 interface Props {
-  // Existing images (edit mode)
   existingImages: ExpenseImage[]
   onDeleteExisting: (id: number) => Promise<void>
-  // Staged files (add mode, also shown alongside existing in edit)
   stagedFiles: File[]
   onStagedFilesChange: (files: File[]) => void
-  // Called when a file is selected in edit mode (for immediate upload)
   onUploadImmediate?: (file: File) => Promise<void>
   isEditMode: boolean
   uploading?: boolean
@@ -31,7 +28,6 @@ export default function ExpenseImagePanel({
   const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null)
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
-  // Create and revoke object URLs for staged files
   useEffect(() => {
     const urls = stagedFiles.map(f => URL.createObjectURL(f))
     setObjectUrls(urls)
@@ -160,12 +156,11 @@ export default function ExpenseImagePanel({
           )}
         </button>
 
+        {/* No capture, no multiple — iOS shows native action sheet with camera + library options */}
         <input
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          multiple
-          capture="environment"
           className="hidden"
           onChange={handleFileChange}
         />
