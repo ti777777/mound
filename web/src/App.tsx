@@ -225,7 +225,10 @@ export default function App() {
   const handleUploadImageEdit = async (file: File) => {
     if (!editExpense) return
     const img = await uploadImageForExpense(editExpense.id, file)
-    if (img) setExpenses(prev => prev.map(e => e.id === editExpense.id ? { ...e, images: [...e.images, img] } : e))
+    if (img) {
+      setExpenses(prev => prev.map(e => e.id === editExpense.id ? { ...e, images: [...e.images, img] } : e))
+      setEditExpense(prev => prev ? { ...prev, images: [...prev.images, img] } : null)
+    }
   }
 
   const handleDeleteImageEdit = async (imgId: number) => {
